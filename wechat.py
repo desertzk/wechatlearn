@@ -6,7 +6,7 @@ from flask import Flask, request, abort, render_template
 import hashlib
 import xmltodict
 import time
-import urllib2
+# import urllib2
 import json
 import requests
 
@@ -128,10 +128,10 @@ def index():
     print("in index:"+url)
     # 使用urllib2的urlopen方法发送请求
     # 如果只传网址url参数，则默认使用http的get请求方式, 返回响应对象
-    response = urllib2.urlopen(url)
+    response = requests.get(url)
 
     # 获取响应体数据,微信返回的json数据
-    json_str = response.read()
+    json_str = response.text
     resp_dict = json.loads(json_str)
     print("json_str:"+json_str)
     # 提取access_token
@@ -145,10 +145,10 @@ def index():
     url = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN" \
           % (access_token, open_id)
 
-    response = urllib2.urlopen(url)
+    response = requests.get(url)
 
     # 读取微信传回的json的响应体数据
-    user_json_str = response.read()
+    user_json_str = response.text
     user_dict_data = json.loads(user_json_str)
     print("userinfo:"+user_json_str)
     if "errcode" in user_dict_data:
@@ -159,10 +159,15 @@ def index():
         return user_json_str
 
 
+
+def get_accesstoken():
+    resp = requests.get(
+        "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + WECHAT_APPID + "&secret=" + WECHAT_APPSECRET)
+    if resp.status_code!=200:
+        return
+    retdict = json.loads(resp.text)
+    access_token = retdict["access_token"]
+
+
 if __name__ == '__main__':
-    # app.run(host="0.0.0.0",port=80, debug=True)
-    resp=requests.get("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+WECHAT_APPID+"&secret="+WECHAT_APPSECRET)
-    # if resp.status_code!=200:
-    #     return
-    retdict=json.loads(resp.text)
-    access_token=retdict["access_token"]
+    app.run(host="0.0.0.0",port=80, debug=True)
