@@ -8,7 +8,7 @@ import xmltodict
 import time
 import urllib2
 import json
-
+import requests
 
 # 常量
 # 微信的token令牌
@@ -47,8 +47,8 @@ def wechat():
     # 将自己计算的签名值与请求的签名参数进行对比，如果相同，则证明请求来自微信服务器
     if signature != sign:
         # 表示请求不是微信发的
-	print("my sign:"+sign)
-	print("wechat sign:"+signature)
+        # print("my sign:"+sign)
+	    # print("wechat sign:"+signature)
         abort(403)
     else:
         # 表示是微信发送的请求
@@ -119,7 +119,7 @@ def index():
         return u"确实code参数"
 
     print("code:"+code)
-    
+
     # 2. 向微信服务器发送http请求，获取access_token
     url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code" \
           % (WECHAT_APPID, WECHAT_APPSECRET, code)
@@ -160,4 +160,9 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",port=80, debug=True)
+    # app.run(host="0.0.0.0",port=80, debug=True)
+    resp=requests.get("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+WECHAT_APPID+"&secret="+WECHAT_APPSECRET)
+    # if resp.status_code!=200:
+    #     return
+    retdict=json.loads(resp.text)
+    access_token=retdict["access_token"]
