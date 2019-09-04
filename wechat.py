@@ -169,5 +169,29 @@ def get_accesstoken():
     access_token = retdict["access_token"]
 
 
+def testinterface():
+    usertokenresponse = requests.get(
+        'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx2a2283f465f7f68a&secret=8c2e9217f7f608c2e040ba68cc788fab',
+        auth=('user', 'pass'))
+    print(usertokenresponse)
+
+    # if usertokenresponse.status_code!=200:
+    #     return
+
+    jsdict = json.loads(usertokenresponse.text)
+    access_tokenstr = jsdict["access_token"]
+
+    userlistresponse = requests.get(
+        'https://api.weixin.qq.com/cgi-bin/user/get?access_token=' + access_tokenstr)
+    print(userlistresponse)
+
+    userinforesponse = requests.get(
+        'https://api.weixin.qq.com/cgi-bin/user/info?access_token=' + access_tokenstr + '&openid=oCE0-wNsOEzivCjtXhIvA3iL2ieg&lang=zh_CN')
+    print(userinforesponse)
+
+
+
+
 if __name__ == '__main__':
+
     app.run(host="0.0.0.0",port=80, debug=True)
