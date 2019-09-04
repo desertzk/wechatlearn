@@ -145,7 +145,7 @@ def index():
     url = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN" \
           % (access_token, open_id)
 
-    response = requests.get(url)
+    response = requests.get(url,encoding='utf-8')
 
     # 读取微信传回的json的响应体数据
     user_json_str = response.text
@@ -170,4 +170,5 @@ def get_accesstoken():
 
 
 if __name__ == '__main__':
+    print("李安")
     app.run(host="0.0.0.0",port=80, debug=True)
