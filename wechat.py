@@ -2,13 +2,15 @@
 import pdb
 
 #import http.client, urllib.parse
-from flask import Flask, request, abort, render_template
+from flask import Flask, request, abort, render_template,redirect,flash
 import hashlib
 import xmltodict
 import time
 # import urllib2
 import json
 import requests
+from wechatlearn.app.forms import RegisterForm
+
 
 # 常量
 # 微信的token令牌
@@ -17,8 +19,13 @@ WECHAT_APPID = "wx2a2283f465f7f68a"
 WECHAT_APPSECRET = "8c2e9217f7f608c2e040ba68cc788fab"
 
 
-app = Flask(__name__)
 
+
+
+app = Flask(__name__)
+app.config.from_pyfile("config/config.cfg")
+# 要用session前需要设置密钥
+app.config["SECRET_KEY"]="zzzzzzzzzzzzzzzzzkkkkkkkkkkkkkkkkkkkkkk"
 
 @app.route("/wx", methods=["GET", "POST"])
 def wechat():
@@ -105,9 +112,17 @@ def wechat():
 def mainpage():
     return "it works"
 
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        flash('Login requested for user {}, remember_me={}'.format(
+            form.username.data, form.remember_me.data))
+        return redirect('/index')
+
+    return render_template('register.html', form=form)
 
 
-# www.itcastcpp.cn/wechat8000/index
 @app.route("/wx/index")
 def index():
     """让用户通过微信访问的网页页面视图"""
