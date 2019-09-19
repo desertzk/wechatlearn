@@ -9,23 +9,17 @@ import time
 # import urllib2
 import json
 import requests
-from app.forms import RegisterForm
 
 
-# 常量
-# 微信的token令牌
-WECHAT_TOKEN = "zhangkai"
-WECHAT_APPID = "wx2a2283f465f7f68a"
-WECHAT_APPSECRET = "8c2e9217f7f608c2e040ba68cc788fab"
+from wechatlearn.app.context import app,WECHAT_TOKEN,WECHAT_APPID,WECHAT_APPSECRET,db
+
+from wechatlearn.app.forms import RegisterForm
+from wechatlearn.app.models import User
 
 
 
 
 
-app = Flask(__name__)
-app.config.from_pyfile("config/config.cfg")
-# 要用session前需要设置密钥
-app.config["SECRET_KEY"]="zzzzzzzzzzzzzzzzzkkkkkkkkkkkkkkkkkkkkkk"
 
 @app.route("/wx", methods=["GET", "POST"])
 def wechat():
@@ -120,6 +114,9 @@ def register():
         flash('Login requested for user {}, remember_me={}'.format(
             form.name.data, form.wxopenid.data))
         print(form.name.data+form.wxopenid.data)
+        user=User(name=form.name.data,identity_id=form.identification.data,open_id=form.wxopenid.data,email=form.email.data)
+        db.session.add(user)
+        db.session.commit()
         return redirect('/index')
 
     return render_template('register.html', form=form,nkname="haha")

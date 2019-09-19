@@ -5,6 +5,7 @@ from wtforms.validators import DataRequired
 class RegisterForm(FlaskForm):
     name = StringField('姓名', validators=[DataRequired()])
     identification = StringField('身份证', validators=[DataRequired()])
+    email = StringField('email', validators=[DataRequired()])
     wxopenid=HiddenField()
     # password = PasswordField('Password', validators=[DataRequired()])
     # remember_me = BooleanField('Remember Me')

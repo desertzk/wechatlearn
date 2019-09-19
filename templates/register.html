@@ -32,7 +32,10 @@
             {{ form.identification.label }}<br>
             {{ form.identification(size=32) }}
         </p>
-
+        <p>
+            {{ form.email.label }}<br>
+            {{ form.email(size=128) }}
+        </p>
         <p>{{ form.submit() }}</p>
     </form>
 
