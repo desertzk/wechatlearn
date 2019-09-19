@@ -9,7 +9,7 @@ import time
 # import urllib2
 import json
 import requests
-from wechatlearn.app.forms import RegisterForm
+from app.forms import RegisterForm
 
 
 # 常量
@@ -115,12 +115,14 @@ def mainpage():
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
+
     if form.validate_on_submit():
         flash('Login requested for user {}, remember_me={}'.format(
-            form.username.data, form.remember_me.data))
+            form.name.data, form.wxopenid.data))
+        print(form.name.data+form.wxopenid.data)
         return redirect('/index')
 
-    return render_template('register.html', form=form)
+    return render_template('register.html', form=form,nkname="haha")
 
 
 @app.route("/wx/index")
@@ -173,7 +175,9 @@ def index():
     else:
         # 将用户的资料数据填充到页面中
         #return render_template("index.html", user=user_dict_data)
-        return user_json_str
+        form = RegisterForm()
+        form.wxopenid.data=open_id
+        return render_template('register.html', form=form,nkname=user_json_str)
 
 
 
