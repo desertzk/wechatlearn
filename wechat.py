@@ -1,6 +1,8 @@
 # coding:utf-8
 import pdb
-
+import os.path
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 #import http.client, urllib.parse
 from flask import Flask, request, abort, render_template,redirect,flash
 import hashlib
@@ -12,7 +14,6 @@ import requests
 
 
 from wechatlearn.app.context import app,WECHAT_TOKEN,WECHAT_APPID,WECHAT_APPSECRET,db
-
 from wechatlearn.app.forms import RegisterForm
 from wechatlearn.app.models import User
 
@@ -106,6 +107,11 @@ def wechat():
 def mainpage():
     return "it works"
 
+
+@app.route("/after_register")
+def after_register():
+    return "注册成功"
+
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -117,7 +123,7 @@ def register():
         user=User(name=form.name.data,identity_id=form.identification.data,open_id=form.wxopenid.data,email=form.email.data)
         db.session.add(user)
         db.session.commit()
-        return redirect('/index')
+        return redirect('/after_register')
 
     return render_template('register.html', form=form,nkname="haha")
 
@@ -174,6 +180,7 @@ def index():
         #return render_template("index.html", user=user_dict_data)
         form = RegisterForm()
         form.wxopenid.data=open_id
+        form.json_user_info=user_json_str
         return render_template('register.html', form=form,nkname=user_json_str)
 
 
