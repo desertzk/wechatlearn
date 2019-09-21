@@ -181,6 +181,7 @@ def index():
         form = RegisterForm()
         form.wxopenid.data=open_id
         form.json_user_info=user_json_str
+        form.sex.data=user_dict_data["sex"]
         return render_template('register.html', form=form,nkname=user_json_str)
 
 
