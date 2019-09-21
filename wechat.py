@@ -112,8 +112,8 @@ def mainpage():
 def after_register():
     return "注册成功"
 
-@app.route("/register", methods=['GET', 'POST'])
-def register():
+@app.route("/registerpost", methods=['GET', 'POST'])
+def registerpost():
     form = RegisterForm()
 
     if form.validate_on_submit():
