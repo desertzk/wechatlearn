@@ -82,8 +82,7 @@ def wechat():
                         "FromUserName": xml_dict.get("ToUserName"),
                         "CreateTime": int(time.time()),
                         "MsgType": "text",
-                        "Content": xml_dict.get("Content")
-                    }
+                        "Content": "http://47.254.240.25/registertest"                    }
                 }
             else:
                 resp_dict = {
@@ -112,20 +111,36 @@ def mainpage():
 def after_register():
     return "注册成功"
 
+@app.route("/registertest", methods=['GET', 'POST'])
+def registertest():
+
+    form = RegisterForm()
+    return render_template('register.html', form=form,nkname="haha")
+
+
+
 @app.route("/register", methods=['GET', 'POST'])
 def register():
+    pdb.set_trace()
     form = RegisterForm()
+    print(request.args)
+    openid=request.args.get("wxopenid")
+    identification=request.args.get("identification")
+    email=request.args.get("email")
 
-    if form.validate_on_submit():
-        flash('Login requested for user {}, remember_me={}'.format(
-            form.name.data, form.wxopenid.data))
-        print(form.name.data+form.wxopenid.data)
-        user=User(name=form.name.data,identity_id=form.identification.data,open_id=form.wxopenid.data,email=form.email.data)
-        db.session.add(user)
-        db.session.commit()
-        return redirect('/after_register')
+    name=request.args.get("name")
+    if openid !=None:
+       #flash('Login requested for user {}, remember_me={}'.format(
+       #    form.name.data, form.wxopenid.data))
+
+       user=User(name=name,identity_id=identification,open_id=openid,email=email)
+       db.session.add(user)
+       db.session.commit()
+       return redirect('/after_register')
 
     return render_template('register.html', form=form,nkname="haha")
+    return "注册失败"
+
 
 
 @app.route("/wx/index")
@@ -138,14 +153,14 @@ def index():
     if not code:
         return u"确实code参数"
 
-    print("code:"+code)
+    #print("code:"+code)
 
     # 2. 向微信服务器发送http请求，获取access_token
     url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code" \
           % (WECHAT_APPID, WECHAT_APPSECRET, code)
 #http.client.HTTPConnection("192.168.73.21",9091)
 
-    print("in index:"+url)
+    #print("in index:"+url)
     # 使用urllib2的urlopen方法发送请求
     # 如果只传网址url参数，则默认使用http的get请求方式, 返回响应对象
     response = requests.get(url)
@@ -181,8 +196,7 @@ def index():
         form = RegisterForm()
         form.wxopenid.data=open_id
         form.json_user_info=user_json_str
-        form.sex.data=user_dict_data["sex"]
-        return render_template('register.html', form=form,nkname=user_json_str)
+        return render_template('register.html', form=form,nkname=open_id )
 
 
 
@@ -222,7 +236,4 @@ def testinterface():
 
 if __name__ == '__main__':
     #testinterface()
-
-    infostr='{"openid":"oCE0-wNsOEzivCjtXhIvA3iL2ieg","nickname":"望尘莫及","sex":1,"language":"en","city":"杭州","province":"浙江","country":"中国","headimgurl":"http:\/\/thirdwx.qlogo.cn\/mmopen\/vi_32\/Q0j4TwGTfTKXzUU0bIPQWC6Xia07jenOIeoyEdNNyqEHMia1ZArFP01mXWB5DD2qzyIM3mwGy7IsiaK896icICRYuw\/132","privilege":[]}'
-
     app.run(host="0.0.0.0",port=80, debug=True)
