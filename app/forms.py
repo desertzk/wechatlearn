@@ -7,6 +7,7 @@ class RegisterForm(FlaskForm):
     identification = StringField('身份证', validators=[DataRequired()])
     email = StringField('email', validators=[DataRequired()])
     wxopenid=HiddenField()
+    sex=HiddenField()
     # password = PasswordField('Password', validators=[DataRequired()])
     # remember_me = BooleanField('Remember Me')
     submit = SubmitField('提交')

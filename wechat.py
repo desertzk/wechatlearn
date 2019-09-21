@@ -174,6 +174,8 @@ def index():
         #return render_template("index.html", user=user_dict_data)
         form = RegisterForm()
         form.wxopenid.data=open_id
+
+        form.sex.data=user_dict_data["sex"]
         return render_template('register.html', form=form,nkname=user_json_str)
 
 
@@ -214,4 +216,7 @@ def testinterface():
 
 if __name__ == '__main__':
     #testinterface()
+
+    infostr='{"openid":"oCE0-wNsOEzivCjtXhIvA3iL2ieg","nickname":"望尘莫及","sex":1,"language":"en","city":"杭州","province":"浙江","country":"中国","headimgurl":"http:\/\/thirdwx.qlogo.cn\/mmopen\/vi_32\/Q0j4TwGTfTKXzUU0bIPQWC6Xia07jenOIeoyEdNNyqEHMia1ZArFP01mXWB5DD2qzyIM3mwGy7IsiaK896icICRYuw\/132","privilege":[]}'
+
     app.run(host="0.0.0.0",port=80, debug=True)

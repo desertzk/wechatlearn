@@ -2,8 +2,8 @@ from .context import db
 import enum
 
 class GenderType(enum.Enum):
-    male = "男"
-    female = "女"
+    male =1
+    female = 0
 
 
 class User(db.Model):
