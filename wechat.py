@@ -105,7 +105,7 @@ def wechat():
 
 @app.route("/")
 def mainpage():
-    return "it works"
+    return render_template('index.html')
 
 
 @app.route("/after_register")
