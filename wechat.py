@@ -112,6 +112,38 @@ def mainpage():
 def after_register():
     return "注册成功"
 
+@app.route("/registertest", methods=['GET', 'POST'])
+def registertest():
+
+    form = RegisterForm()
+    return render_template('register.html', form=form,nkname="haha")
+
+
+
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+    pdb.set_trace()
+    form = RegisterForm()
+    print(request.args)
+    openid=request.args.get("wxopenid")
+    identification=request.args.get("identification")
+    email=request.args.get("email")
+
+    name=request.args.get("name")
+    if openid !=None:
+       #flash('Login requested for user {}, remember_me={}'.format(
+       #    form.name.data, form.wxopenid.data))
+
+       user=User(name=name,identity_id=identification,open_id=openid,email=email)
+       db.session.add(user)
+       db.session.commit()
+       return redirect('/after_register')
+
+    return render_template('register.html', form=form,nkname="haha")
+    return "注册失败"
+
+
+
 @app.route("/registerpost", methods=['GET', 'POST'])
 def registerpost():
     form = RegisterForm()
@@ -128,6 +160,7 @@ def registerpost():
     return render_template('register.html', form=form,nkname="haha")
 
 
+
 @app.route("/wx/index")
 def index():
     """让用户通过微信访问的网页页面视图"""
@@ -138,14 +171,14 @@ def index():
     if not code:
         return u"确实code参数"
 
-    print("code:"+code)
+    #print("code:"+code)
 
     # 2. 向微信服务器发送http请求，获取access_token
     url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code" \
           % (WECHAT_APPID, WECHAT_APPSECRET, code)
 #http.client.HTTPConnection("192.168.73.21",9091)
 
-    print("in index:"+url)
+    #print("in index:"+url)
     # 使用urllib2的urlopen方法发送请求
     # 如果只传网址url参数，则默认使用http的get请求方式, 返回响应对象
     response = requests.get(url)
