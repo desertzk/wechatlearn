@@ -108,6 +108,20 @@ def mainpage():
     return render_template('index.html')
 
 
+
+@app.route('/user/<identity_id>')
+def show_user(identity_id):
+    user = User.query.filter_by(identity_id=identity_id).first_or_404()
+    # return render_template('show_user.html', user=user)
+    return user.name+user.open_id+user.email
+
+@app.route("/usersmanagerment")
+def query_all_users():
+    userlist=User.query.order_by(User.name).all()
+    return render_template('usermanagerment.html', userlist=userlist)
+
+
+
 @app.route("/after_register")
 def after_register():
     return "注册成功"
@@ -122,7 +136,7 @@ def registertest():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
-    pdb.set_trace()
+    # pdb.set_trace()
     form = RegisterForm()
     print(request.args)
     openid=request.args.get("wxopenid")

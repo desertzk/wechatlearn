@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+<body>
+{% for user in userlist %}
+    <a href="/user/{{user.identity_id}}">{{user.name}}</a>
+{% endfor %}
+
+</body>
+</html>
