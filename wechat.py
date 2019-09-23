@@ -18,6 +18,47 @@ from wechatlearn.app.forms import RegisterForm
 from wechatlearn.app.models import User
 
 
+class wechatrequest():
+    def __init__(self):
+        self._wxaccesstoken=""
+
+    @staticmethod
+    def get_accesstoken(self):
+        if self._wxaccesstoken != "":
+            return self._wxaccesstoken
+        resp = requests.get(
+            "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + WECHAT_APPID + "&secret=" + WECHAT_APPSECRET)
+        if resp.status_code != 200:
+            print("request error"+resp.status_code)
+            return ""
+        retdict = json.loads(resp.text)
+        self._wxaccesstoken = retdict["access_token"]
+        return self._wxaccesstoken
+
+    @staticmethod
+    def wxgetuserinfo(self,open_id):
+        url = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN" \
+              % (self._wxaccesstoken, open_id)
+
+        response = requests.get(url)
+        response.encoding = 'utf-8'
+        # data = response.json()
+        # 读取微信传回的json的响应体数据
+        # pdb.set_trace()
+        if response.status_code==200:
+            return response.text
+
+    # 客服接口-发消息
+    def sendwxmessagetouser(self,open_id,content):
+        url = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=%s" \
+              % (self._wxaccesstoken)
+
+        senddata='{  \
+        "touser":open_id, \
+        "msgtype":"text",   \
+        "text":{"content":content} \
+        }'
+        response = requests.post(url,senddata)
 
 
 
@@ -107,13 +148,19 @@ def wechat():
 def mainpage():
     return render_template('index.html')
 
-
+@app.route("/sendtouserpage", methods=['GET', 'POST'])
+def sendtouserpage():
+    open_id=request.form.get("openid")
+    pcontent=request.form.get("content")
+    pdb.set_trace()
+    wechatrequest().sendwxmessagetouser(open_id,pcontent)
+    return "success"
 
 @app.route('/user/<identity_id>')
 def show_user(identity_id):
     user = User.query.filter_by(identity_id=identity_id).first_or_404()
     # return render_template('show_user.html', user=user)
-    return user.name+user.open_id+user.email
+    return render_template('sendtouserpage.html', user=user)
 
 @app.route("/usersmanagerment")
 def query_all_users():
