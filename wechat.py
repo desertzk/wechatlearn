@@ -145,13 +145,19 @@ def register():
 
     name=request.args.get("name")
     if openid !=None:
-       #flash('Login requested for user {}, remember_me={}'.format(
-       #    form.name.data, form.wxopenid.data))
+        try:
+           userinfo=User.query.filter_by(username='admin').first()
+           if userinfo!=None:
+               return "已经注册"
 
-       user=User(name=name,identity_id=identification,open_id=openid,email=email)
-       db.session.add(user)
-       db.session.commit()
-       return redirect('/after_register')
+           user=User(name=name,identity_id=identification,open_id=openid,email=email)
+           db.session.add(user)
+           db.session.commit()
+           return redirect('/after_register')
+        except Exception as e:
+            print(e)
+            return str(e)
+
 
     return render_template('register.html', form=form,nkname="haha")
     return "注册失败"
