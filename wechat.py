@@ -20,9 +20,9 @@ from wechatlearn.app.models import User
 
 class wechatrequest():
     def __init__(self):
-        self._wxaccesstoken=get_accesstoken()
+        self._wxaccesstoken=""
 
-    @staticmethod
+
     def get_accesstoken(self):
         if self._wxaccesstoken != "":
             return self._wxaccesstoken
@@ -35,7 +35,7 @@ class wechatrequest():
         self._wxaccesstoken = retdict["access_token"]
         return self._wxaccesstoken
 
-    @staticmethod
+
     def wxgetuserinfo(self,open_id):
         url = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN" \
               % (self._wxaccesstoken, open_id)
@@ -66,6 +66,9 @@ class wechatrequest():
 
 
 
+
+g_wxreq=wechatrequest()
+g_wxreq.get_accesstoken()
 
 @app.route("/wx", methods=["GET", "POST"])
 def wechat():
@@ -157,7 +160,7 @@ def sendtouserpage():
     open_id=request.form.get("openid")
     pcontent=request.form.get("content")
     pdb.set_trace()
-    wechatrequest().sendwxmessagetouser(open_id,pcontent)
+    g_wxreq.sendwxmessagetouser(open_id,pcontent)
     return "success"
 
 @app.route('/user/<identity_id>')
