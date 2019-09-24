@@ -54,11 +54,13 @@ class wechatrequest():
               % (self._wxaccesstoken)
 
         senddata='{  \
-        "touser":%s, \
+        "touser":"%s", \
         "msgtype":"text",   \
-        "text":{"content":%s} \
+        "text":{"content":"%s"} \
         }'%(open_id,content)
         response = requests.post(url,senddata)
+        print("post url"+url+"senddata:"+senddata+"response:"+response.text)
+
         jsondict=json.loads(response.text)
         if jsondict.get("errcode")==41001:
             print(jsondict.get("errmsg"))
