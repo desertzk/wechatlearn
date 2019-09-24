@@ -59,6 +59,8 @@ class wechatrequest():
         "text":{"content":content} \
         }'
         response = requests.post(url,senddata)
+        if response.status_code!=200:
+            print("sendwxmessagetouser error "+response.text)
 
 
 
