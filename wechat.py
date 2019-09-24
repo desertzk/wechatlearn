@@ -20,7 +20,7 @@ from wechatlearn.app.models import User
 
 class wechatrequest():
     def __init__(self):
-        self._wxaccesstoken=""
+        self._wxaccesstoken=get_accesstoken()
 
     @staticmethod
     def get_accesstoken(self):
@@ -59,8 +59,10 @@ class wechatrequest():
         "text":{"content":content} \
         }'
         response = requests.post(url,senddata)
-        if response.status_code!=200:
-            print("sendwxmessagetouser error "+response.text)
+        jsondict=json.loads(response.text)
+        if jsondict.get("errcode")==41001:
+            print(jsondict.get("errmsg"))
+            response = requests.post(url, senddata)
 
 
 
