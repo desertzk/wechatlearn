@@ -161,7 +161,7 @@ def mainpage():
 def sendtouserpage():
     open_id=request.form.get("openid")
     pcontent=request.form.get("content")
-    pdb.set_trace()
+    #pdb.set_trace()
     g_wxreq.sendwxmessagetouser(open_id,pcontent)
     return "success"
 
@@ -202,7 +202,7 @@ def register():
     name=request.args.get("name")
     if openid !=None:
         try:
-           userinfo=User.query.filter_by(username='admin').first()
+           userinfo=User.query.filter_by(identification=identification).first()
            if userinfo!=None:
                return "已经注册"
 
