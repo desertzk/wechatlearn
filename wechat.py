@@ -202,7 +202,7 @@ def register():
     name=request.args.get("name")
     if openid !=None:
         try:
-           userinfo=User.query.filter_by(identification=identification).first()
+           userinfo=User.query.filter_by(identity_id=identification).first()
            if userinfo!=None:
                return "已经注册"
 

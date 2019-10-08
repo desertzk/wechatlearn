@@ -15,6 +15,6 @@ app = Flask(__name__,static_folder='../static', template_folder='../templates')
 app.config.from_pyfile("../config/config.cfg")
 # 要用session前需要设置密钥
 app.config["SECRET_KEY"]="zzzzzzzzzzzzzzzzzkkkkkkkkkkkkkkkkkkkkkk"
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://zk:zk@47.254.240.25:3306/medical'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://zk:87810141@49.234.65.123:3306/medical'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
