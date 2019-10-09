@@ -14,9 +14,9 @@ import json
 import requests
 
 
-from wechatlearn.app.context import app,WECHAT_TOKEN,WECHAT_APPID,WECHAT_APPSECRET,db
-from wechatlearn.app.forms import RegisterForm
-from wechatlearn.app.models import User
+from .app.context import app,WECHAT_TOKEN,WECHAT_APPID,WECHAT_APPSECRET,db
+from .app.forms import RegisterForm,DailyCheckForm
+from .app.models import User
 
 
 class wechatrequest():
@@ -240,6 +240,22 @@ def registerpost():
 
     return render_template('register.html', form=form,nkname="haha")
 
+
+
+@app.route("/dailycheck", methods=['GET', 'POST'])
+def dailycheck():
+    form = DailyCheckForm()
+
+    if form.validate_on_submit():
+        flash('Login requested for user {}, remember_me={}'.format(
+            form.identification.data, form.blood_pressure.data))
+        print(form.name.data+form.wxopenid.data)
+        user=User(name=form.name.data,identity_id=form.identification.data,open_id=form.wxopenid.data,email=form.email.data)
+        db.session.add(user)
+        db.session.commit()
+        return redirect('/after_register')
+
+    return render_template('register.html', form=form,nkname="haha")
 
 
 @app.route("/wx/index")
