@@ -2,6 +2,7 @@
 import pdb
 import os.path
 import sys
+import urllib.parse
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 #import http.client, urllib.parse
 from flask import Flask, request, abort, render_template,redirect,flash
@@ -52,19 +53,23 @@ class wechatrequest():
     def sendwxmessagetouser(self,open_id,content):
         url = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=%s" \
               % (self._wxaccesstoken)
-
+        # print(content)
+        # print(type(content))
         senddata='{  \
         "touser":"%s", \
         "msgtype":"text",   \
         "text":{"content":"%s"} \
         }'%(open_id,content)
-        response = requests.post(url,senddata)
+        jsonsendstr=senddata.encode("utf-8")
+        headers = {'Content-Type': 'application/json;encoding=utf-8'}
+        response = requests.post(url,jsonsendstr,headers=headers)
         print("post url"+url+"senddata:"+senddata+"response:"+response.text)
 
         jsondict=json.loads(response.text)
         if jsondict.get("errcode")==41001:
             print(jsondict.get("errmsg"))
-            response = requests.post(url, senddata)
+            self.get_accesstoken()
+            response = requests.post(url, jsonsendstr,headers=headers)
 
 
 
