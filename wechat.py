@@ -16,7 +16,7 @@ import requests
 
 from .app.context import app,WECHAT_TOKEN,WECHAT_APPID,WECHAT_APPSECRET,db
 from .app.forms import RegisterForm,DailyCheckForm
-from .app.models import User
+from .app.models import User,Daytimecheckdata
 
 
 class wechatrequest():
@@ -44,12 +44,12 @@ class wechatrequest():
         response = requests.get(url)
         response.encoding = 'utf-8'
         # data = response.json()
-        # 读取微信传回的json的响应体数据
+        # read wechat return json response data
         # pdb.set_trace()
         if response.status_code==200:
             return response.text
 
-    # 客服接口-发消息
+    # 客服接口-send message
     def sendwxmessagetouser(self,open_id,content):
         url = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=%s" \
               % (self._wxaccesstoken)
@@ -250,8 +250,18 @@ def dailycheck():
         flash('Login requested for user {}, remember_me={}'.format(
             form.identification.data, form.blood_pressure.data))
         print(form.name.data+form.wxopenid.data)
-        user=User(name=form.name.data,identity_id=form.identification.data,open_id=form.wxopenid.data,email=form.email.data)
-        db.session.add(user)
+        dailycheckdata=Daytimecheckdata(name=form.blood_pressure.data
+                                        ,identity_id=form.identification.data,
+                                        rhythm_of_heart=form.rhythm_of_heart.data,
+                                        visit_time=form.visit_time.data,
+                                        triglyceride=form.triglyceride.data,
+                                        total_cholesterol=form.total_cholesterol.data,
+                                        hdl_c=form.hdl_c.data,
+                                        ldl_c=form.ldl_c.data,
+                                        BNP=form.BNP.data,
+                                        creatinine=form.creatinine.data,
+                                        medicines_list=form.medicines_list.data)
+        db.session.add(dailycheckdata)
         db.session.commit()
         return redirect('/after_register')
 
@@ -340,7 +350,7 @@ def testinterface():
     userlistresponse = requests.get(
         'https://api.weixin.qq.com/cgi-bin/user/get?access_token=' + access_tokenstr)
     print(userlistresponse)
-    
+
     userinforesponse = requests.get(
         'https://api.weixin.qq.com/cgi-bin/user/info?access_token=' + access_tokenstr + '&openid=oCE0-wNsOEzivCjtXhIvA3iL2ieg&lang=zh_CN')
     pdb.set_trace()
