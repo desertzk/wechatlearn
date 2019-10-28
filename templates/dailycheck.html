@@ -17,20 +17,58 @@
 
 
     <h1>每日必填</h1>
-    <form action="/register" method="get" novalidate>
+    <form action="/dailycheck" method="post" novalidate>
         {{ form.hidden_tag() }}
-        <p>
-            {{ form.name.label }}<br>
-            {{ form.name(size=32) }}
-        </p>
-        <p>
+                <p>
             {{ form.identification.label }}<br>
             {{ form.identification(size=32) }}
         </p>
         <p>
-            {{ form.email.label }}<br>
-            {{ form.email(size=32) }}
+            {{ form.blood_pressure.label }}<br>
+            {{ form.blood_pressure(size=32) }}
         </p>
+
+        <p>
+            {{ form.rhythm_of_heart.label }}<br>
+            {{ form.rhythm_of_heart(size=32) }}
+        </p>    
+        <p>
+            {{ form.medicines_list.label }}<br>
+            {{ form.medicines_list(size=256) }}
+        </p>
+        <p>
+            {{ form.visit_time.label }}<br>
+            {{ form.visit_time(size=32) }}
+        </p>
+        <p>
+            {{ form.triglyceride.label }}<br>
+            {{ form.triglyceride(size=32) }}
+        </p> 
+        <p>
+            {{ form.total_cholesterol.label }}<br>
+            {{ form.total_cholesterol(size=32) }}
+        </p>
+  
+        <p>
+            {{ form.hdl_c.label }}<br>
+            {{ form.hdl_c(size=32) }}
+        </p> 
+        <p>
+            {{ form.ldl_c.label }}<br>
+            {{ form.ldl_c(size=32) }}
+        </p> 
+        <p>
+            {{ form.BNP.label }}<br>
+            {{ form.BNP(size=32) }}
+        </p> 
+        <p>
+            {{ form.creatinine.label }}<br>
+            {{ form.creatinine(size=32) }}
+        </p>
+
+
+
+
         <p>{{ form.submit() }}</p>
     </form>
 

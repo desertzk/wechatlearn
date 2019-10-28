@@ -17,8 +17,9 @@ class RegisterForm(FlaskForm):
 class DailyCheckForm(FlaskForm):
     identification = StringField('身份证', validators=[DataRequired()])
 
-    blood_pressure = IntegerField('血压')
-    rhythm_of_heart = IntegerField('心律')
+    blood_pressure = IntegerField('舒张压')
+    blood_pressure = IntegerField('收缩压')
+    rhythm_of_heart = IntegerField('心率')
     medicines_list = StringField('药物清单')
     visit_time = IntegerField('随访时间')
     triglyceride = DecimalField('甘油三酸酯')

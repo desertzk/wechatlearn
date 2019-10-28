@@ -1,6 +1,8 @@
 from .context import db
 import enum
 import os
+from datetime import datetime
+
 
 class GenderType(enum.Enum):
     male =1
@@ -30,7 +32,6 @@ class User(db.Model):
 
 class Daytimecheckdata(db.Model):
     __tablename__ = 'tdaytimecheckdata'
-    id = db.Column(db.Integer)
     blood_pressure = db.Column(db.Integer)
     rhythm_of_heart = db.Column(db.Integer)
     medicines_list = db.Column(db.String(256))
@@ -42,7 +43,7 @@ class Daytimecheckdata(db.Model):
     identity_id=db.Column(db.String(32), primary_key=True)
     BNP = db.Column(db.DECIMAL(10,2))
     creatinine = db.Column(db.DECIMAL(10,2))
-    datetime = db.Column(db.Date,default=datetime.datetime.now,primary_key=True)
+    datetime = db.Column(db.Date,default=datetime.today().strftime("%Y-%m-%d"),primary_key=True)
 
 
     def __repr__(self):

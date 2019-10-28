@@ -12,11 +12,11 @@ import time
 # import urllib2
 import json
 import requests
+import logging
 
-
-from .app.context import app,WECHAT_TOKEN,WECHAT_APPID,WECHAT_APPSECRET,db
-from .app.forms import RegisterForm,DailyCheckForm
-from .app.models import User,Daytimecheckdata
+from app.context import app,WECHAT_TOKEN,WECHAT_APPID,WECHAT_APPSECRET,db
+from app.forms import RegisterForm,DailyCheckForm
+from app.models import User,Daytimecheckdata
 
 
 class wechatrequest():
@@ -249,8 +249,8 @@ def dailycheck():
     if form.validate_on_submit():
         flash('Login requested for user {}, remember_me={}'.format(
             form.identification.data, form.blood_pressure.data))
-        print(form.name.data+form.wxopenid.data)
-        dailycheckdata=Daytimecheckdata(name=form.blood_pressure.data
+        try:
+            dailycheckdata=Daytimecheckdata(blood_pressure=form.blood_pressure.data
                                         ,identity_id=form.identification.data,
                                         rhythm_of_heart=form.rhythm_of_heart.data,
                                         visit_time=form.visit_time.data,
@@ -261,11 +261,18 @@ def dailycheck():
                                         BNP=form.BNP.data,
                                         creatinine=form.creatinine.data,
                                         medicines_list=form.medicines_list.data)
-        db.session.add(dailycheckdata)
-        db.session.commit()
-        return redirect('/after_register')
+            db.session.add(dailycheckdata)
+            db.session.commit()
 
-    return render_template('register.html', form=form,nkname="haha")
+            return "成功"
+        except Exception as ex:
+            exstr=str(ex)
+            if "Duplicate entry" in exstr:
+                return "不许重复录入"
+            return str(ex)
+
+
+    return render_template('dailycheck.html', form=form,nkname="haha")
 
 
 @app.route("/wx/index")
@@ -364,5 +371,5 @@ if __name__ == '__main__':
     #testinterface()
 
     infostr='{"openid":"oCE0-wNsOEzivCjtXhIvA3iL2ieg","nickname":"望尘莫及","sex":1,"language":"en","city":"杭州","province":"浙江","country":"中国","headimgurl":"http:\/\/thirdwx.qlogo.cn\/mmopen\/vi_32\/Q0j4TwGTfTKXzUU0bIPQWC6Xia07jenOIeoyEdNNyqEHMia1ZArFP01mXWB5DD2qzyIM3mwGy7IsiaK896icICRYuw\/132","privilege":[]}'
-
+    logging.basicConfig(filename='medicallog.log',level=logging.DEBUG)
     app.run(host="0.0.0.0",port=80, debug=True)
