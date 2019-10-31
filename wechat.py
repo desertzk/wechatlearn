@@ -143,6 +143,20 @@ def wechat():
                         "Content": xml_dict.get("Content")
                     }
                 }
+            elif msg_type=="event":
+                print("event")
+                openid=xml_dict.get("FromUserName")
+                createqrcode(openid)
+                resp_dict = {
+                    "xml": {
+                        "ToUserName": xml_dict.get("FromUserName"),
+                        "FromUserName": xml_dict.get("ToUserName"),
+                        "CreateTime": int(time.time()),
+                        "MsgType": "text",
+                        "Content": xml_dict.get("Content")
+                    }
+                }
+
             else:
                 resp_dict = {
                     "xml": {
@@ -150,7 +164,7 @@ def wechat():
                         "FromUserName": xml_dict.get("ToUserName"),
                         "CreateTime": int(time.time()),
                         "MsgType": "text",
-                        "Content": "i love u"
+                        "Content": "thanks"
                     }
                 }
 
@@ -203,46 +217,12 @@ def getuserqrcode():
     patientimg="resources/"+openid+"jpg"
     return render_template('patientqrcode.html',patientimg)
 
-@app.route("/createqrcode", methods=['GET', 'POST'])
-def createqrcode():
-    """让用户通过微信访问的网页页面视图"""
-    # 从微信服务器中拿去用户的资料数据
-    # 1. 拿去code参数
-    code = request.args.get("code")
-
-    if not code:
-        return u"缺失code参数"
-
-    # print("code:"+code)
-
-    # 2. 向微信服务器发送http请求，获取access_token
-    url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code" \
-          % (WECHAT_APPID, WECHAT_APPSECRET, code)
-    # http.client.HTTPConnection("192.168.73.21",9091)
-
-    # print("in index:"+url)
-    # 使用urllib2的urlopen方法发送请求
-    # 如果只传网址url参数，则默认使用http的get请求方式, 返回响应对象
-    response = requests.get(url)
-
-    # 获取响应体数据,微信返回的json数据
-    json_str = response.text
-    resp_dict = json.loads(json_str)
-    print("json_str:" + json_str)
-    # 提取access_token
-    if "errcode" in resp_dict:
-        return u"获取access_token失败"
-
-    access_token = resp_dict.get("access_token")
-    open_id = resp_dict.get("openid")  # 用户的编号
-    print("open_id" + open_id)
-
-
-
-    url=app.config["HOST"]+"?"+open_id
+def createqrcode(open_id):
+    url=app.config["HOST"]+"getqrcode?"+open_id
+    print("createqrcodeurl:" + url)
     img = qrcode.make(url)
     img.save("resources/"+open_id+".jpg")
-    return redirect('/getqrcode?'+open_id)
+    return url
 
 
 @app.route("/register", methods=['GET', 'POST'])
