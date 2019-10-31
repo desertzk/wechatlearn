@@ -74,6 +74,12 @@ class wechatrequest():
             self.get_accesstoken()
             response = requests.post(url, jsonsendstr,headers=headers)
 
+    def send_tmp_media(self,filename):
+        files = {'media': open(filename, 'rb')}
+        url = "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=image"% (self._wxaccesstoken)
+        rsp = requests.post(url, files=files)
+        print(rsp.text)
+
 
 
 
@@ -399,7 +405,7 @@ def testinterface():
 
 if __name__ == '__main__':
     #testinterface()
-
+    g_wxreq.send_tmp_media(r"H:\ccppworkspace\imageprocess\Project1\lena_top.jpg")
     infostr='{"openid":"oCE0-wNsOEzivCjtXhIvA3iL2ieg","nickname":"望尘莫及","sex":1,"language":"en","city":"杭州","province":"浙江","country":"中国","headimgurl":"http:\/\/thirdwx.qlogo.cn\/mmopen\/vi_32\/Q0j4TwGTfTKXzUU0bIPQWC6Xia07jenOIeoyEdNNyqEHMia1ZArFP01mXWB5DD2qzyIM3mwGy7IsiaK896icICRYuw\/132","privilege":[]}'
     logging.basicConfig(filename='medicallog.log',level=logging.DEBUG)
     app.run(host="0.0.0.0",port=80, debug=True)
