@@ -240,8 +240,10 @@ def registertest():
 def getuserqrcode():
     openid = request.args.get('openid')
     print("getuserqrcode:openid"+openid)
+    user = User.query.filter_by(open_id=openid).first_or_404()
+    daytimedatas=Daytimecheckdata.query.filter_by(identity_id=user.identity_id)
     #patientimg="resources/"+openid+"jpg"
-    return render_template('patientqrcode.html',open_id=openid)
+    return render_template('patientqrcode.html',user=user,daytimedatas=daytimedatas)
 
 def createqrcode(open_id):
     url=app.config["HOST"]+"getqrcode?openid="+open_id

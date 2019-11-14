@@ -5,12 +5,25 @@
     <title>Title</title>
 </head>
 <body>
+
+姓名:{{user.name}}<br>
+生日:{{user.birthday}}<br>
+身高:{{user.height}}<br>
+体重:{{user.weight}}<br>
+性别:{{user.gender}}<br>
+{{
+for daytimedata in daytimedatas:
+    "舒张压:"+daytimedata.diastolic_pressure+"收缩压:"+daytimedata.systolic_pressure
+    +"心律:"+daytimedata.rhythm_of_heart+"日期:"+daytimedata.datetime
+
+}}
+<br>
     <!--img src="{{patientimg}}" alt="My Image"-->
     <form action="/doctoruserpage" method="post"> 
     内容:<br>
     <input type="text" name="content" >
     <br><br>
-<input type="hidden" name="openid" value="{{open_id}}">
+<input type="hidden" name="openid" value="{{user.open_id}}">
     <input type="submit" value="Submit">
 
     </form>
