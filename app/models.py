@@ -32,17 +32,18 @@ class User(db.Model):
 
 class Daytimecheckdata(db.Model):
     __tablename__ = 'tdaytimecheckdata'
-    blood_pressure = db.Column(db.Integer)
+    diastolic_pressure = db.Column(db.Integer)
+    systolic_pressure = db.Column(db.Integer)
     rhythm_of_heart = db.Column(db.Integer)
     medicines_list = db.Column(db.String(256))
-    visit_time = db.Column(db.Integer)
-    triglyceride = db.Column(db.DECIMAL(10,2))
-    total_cholesterol=db.Column(db.DECIMAL(10,2))
-    hdl_c=db.Column(db.DECIMAL(10,2))
-    ldl_c=db.Column(db.DECIMAL(10,2))
+   # visit_time = db.Column(db.Integer)
+   # triglyceride = db.Column(db.DECIMAL(10,2))
+   # total_cholesterol=db.Column(db.DECIMAL(10,2))
+   # hdl_c=db.Column(db.DECIMAL(10,2))
+   # ldl_c=db.Column(db.DECIMAL(10,2))
     identity_id=db.Column(db.String(32), primary_key=True)
-    BNP = db.Column(db.DECIMAL(10,2))
-    creatinine = db.Column(db.DECIMAL(10,2))
+   # BNP = db.Column(db.DECIMAL(10,2))
+   # creatinine = db.Column(db.DECIMAL(10,2))
     datetime = db.Column(db.Date,default=datetime.today().strftime("%Y-%m-%d"),primary_key=True)
 
 

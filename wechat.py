@@ -79,6 +79,20 @@ class wechatrequest():
         url = "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=image"% (self._wxaccesstoken)
         rsp = requests.post(url, files=files)
         print(rsp.text)
+        if self.checktoken(self,rsp.text):
+            rsp = requests.post(url, files=files)
+            print(rsp.text)
+
+        return rsp.text
+
+    def checktoken(self,jsondict):
+        if jsondict.get("errcode")==41001 or jsondict.get("errcode")==42001:
+            print(jsondict.get("errmsg"))
+            self.get_accesstoken()
+            return True
+        else:
+            return False
+            #response = requests.post(url, jsonsendstr,headers=headers)
 
 
 
@@ -153,13 +167,17 @@ def wechat():
                 print("event")
                 openid=xml_dict.get("FromUserName")
                 createqrcode(openid)
+                rspjson=g_wxreq.send_tmp_media("resources/"+openid+".jpg")
+                rspdict=json.loads(rspjson)
                 resp_dict = {
                     "xml": {
                         "ToUserName": xml_dict.get("FromUserName"),
                         "FromUserName": xml_dict.get("ToUserName"),
                         "CreateTime": int(time.time()),
-                        "MsgType": "text",
-                        "Content": xml_dict.get("Content")
+                        "MsgType": "image",
+                        "Image":{
+                            "MediaId":rspdict["media_id"]
+                        }
                     }
                 }
 
@@ -176,6 +194,7 @@ def wechat():
 
             # 将字典转换为xml字符串
             resp_xml_str = xmltodict.unparse(resp_dict)
+            print(resp_xml_str)
             # 返回消息数据给微信服务器
             return resp_xml_str
 
@@ -220,11 +239,13 @@ def registertest():
 @app.route("/getqrcode", methods=['GET'])
 def getuserqrcode():
     openid = request.args.get('openid')
-    patientimg="resources/"+openid+"jpg"
-    return render_template('patientqrcode.html',patientimg)
+    print("getuserqrcode:openid"+openid)
+    #patientimg="resources/"+openid+"jpg"
+    return render_template('patientqrcode.html',open_id=openid)
 
 def createqrcode(open_id):
-    url=app.config["HOST"]+"getqrcode?"+open_id
+    url=app.config["HOST"]+"getqrcode?openid="+open_id
+
     print("createqrcodeurl:" + url)
     img = qrcode.make(url)
     img.save("resources/"+open_id+".jpg")
@@ -284,18 +305,20 @@ def dailycheck():
 
     if form.validate_on_submit():
         flash('Login requested for user {}, remember_me={}'.format(
-            form.identification.data, form.blood_pressure.data))
+            form.identification.data, form.diastolic_pressure.data))
         try:
-            dailycheckdata=Daytimecheckdata(blood_pressure=form.blood_pressure.data
-                                        ,identity_id=form.identification.data,
+            print(form.identification.data)
+            dailycheckdata=Daytimecheckdata(diastolic_pressure = form.diastolic_pressure.data
+                                        ,systolic_pressure=form.systolic_pressure.data,
+                                        identity_id=form.identification.data,
                                         rhythm_of_heart=form.rhythm_of_heart.data,
-                                        visit_time=form.visit_time.data,
-                                        triglyceride=form.triglyceride.data,
-                                        total_cholesterol=form.total_cholesterol.data,
-                                        hdl_c=form.hdl_c.data,
-                                        ldl_c=form.ldl_c.data,
-                                        BNP=form.BNP.data,
-                                        creatinine=form.creatinine.data,
+                                        #visit_time=form.visit_time.data,
+                                        #triglyceride=form.triglyceride.data,
+                                        #total_cholesterol=form.total_cholesterol.data,
+                                        #hdl_c=form.hdl_c.data,
+                                        #ldl_c=form.ldl_c.data,
+                                        #BNP=form.BNP.data,
+                                        #creatinine=form.creatinine.data,
                                         medicines_list=form.medicines_list.data)
             db.session.add(dailycheckdata)
             db.session.commit()
@@ -309,6 +332,43 @@ def dailycheck():
 
 
     return render_template('dailycheck.html', form=form,nkname="haha")
+
+
+#@app.route("/dailycheck", methods=['GET', 'POST'])
+#def dailycheck():
+#    form = DailyCheckForm()
+#
+#    if form.validate_on_submit():
+#        flash('Login requested for user {}, remember_me={}'.format(
+#            form.identification.data, form.diastolic_pressure.data))
+#        try:
+#            print(form.identification.data)
+#            dailycheckdata=Daytimecheckdata(diastolic_pressure = form.diastolic_pressure.data
+#                                        ,systolic_pressure=form.systolic_pressure.data,
+#                                        identity_id=form.identification.data,
+#                                        rhythm_of_heart=form.rhythm_of_heart.data,
+#                                        #visit_time=form.visit_time.data,
+#                                        #triglyceride=form.triglyceride.data,
+#                                        #total_cholesterol=form.total_cholesterol.data,
+#                                        #hdl_c=form.hdl_c.data,
+#                                        #ldl_c=form.ldl_c.data,
+#                                        #BNP=form.BNP.data,
+#                                        #creatinine=form.creatinine.data,
+#                                        medicines_list=form.medicines_list.data)
+#            db.session.add(dailycheckdata)
+#            db.session.commit()
+#
+#            return "成功"
+#        except Exception as ex:
+#            exstr=str(ex)
+#            if "Duplicate entry" in exstr:
+#                return "不许重复录入"
+#            return str(ex)
+#
+#
+#    return render_template('patientqrcode.html', form=form,nkname="haha")
+
+
 
 
 @app.route("/wx/index")
@@ -405,7 +465,7 @@ def testinterface():
 
 if __name__ == '__main__':
     #testinterface()
-    g_wxreq.send_tmp_media(r"H:\ccppworkspace\imageprocess\Project1\lena_top.jpg")
+    #g_wxreq.send_tmp_media(r"H:\ccppworkspace\imageprocess\Project1\lena_top.jpg")
     infostr='{"openid":"oCE0-wNsOEzivCjtXhIvA3iL2ieg","nickname":"望尘莫及","sex":1,"language":"en","city":"杭州","province":"浙江","country":"中国","headimgurl":"http:\/\/thirdwx.qlogo.cn\/mmopen\/vi_32\/Q0j4TwGTfTKXzUU0bIPQWC6Xia07jenOIeoyEdNNyqEHMia1ZArFP01mXWB5DD2qzyIM3mwGy7IsiaK896icICRYuw\/132","privilege":[]}'
     logging.basicConfig(filename='medicallog.log',level=logging.DEBUG)
     app.run(host="0.0.0.0",port=80, debug=True)

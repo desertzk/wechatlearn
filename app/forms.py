@@ -17,17 +17,17 @@ class RegisterForm(FlaskForm):
 class DailyCheckForm(FlaskForm):
     identification = StringField('身份证', validators=[DataRequired()])
 
-    blood_pressure = IntegerField('舒张压')
-    blood_pressure = IntegerField('收缩压')
+    diastolic_pressure = IntegerField('舒张压')
+    systolic_pressure = IntegerField('收缩压')
     rhythm_of_heart = IntegerField('心率')
     medicines_list = StringField('药物清单')
-    visit_time = IntegerField('随访时间')
-    triglyceride = DecimalField('甘油三酸酯')
-    total_cholesterol = DecimalField('总胆固醇')
-    hdl_c = DecimalField('高密度脂蛋白胆固醇')
-    ldl_c = DecimalField('低密度脂蛋白胆固醇')
-    BNP = DecimalField('BNP')
-    creatinine = DecimalField('肌酐')
+    #visit_time = IntegerField('随访时间')
+    #triglyceride = DecimalField('甘油三酸酯')
+    #total_cholesterol = DecimalField('总胆固醇')
+    #hdl_c = DecimalField('高密度脂蛋白胆固醇')
+    #ldl_c = DecimalField('低密度脂蛋白胆固醇')
+    #BNP = DecimalField('BNP')
+    #creatinine = DecimalField('肌酐')
 
 
     # password = PasswordField('Password', validators=[DataRequired()])

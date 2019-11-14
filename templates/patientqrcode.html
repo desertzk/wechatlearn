@@ -5,6 +5,14 @@
     <title>Title</title>
 </head>
 <body>
-    <img src="{{patientimg}}" alt="My Image">
+    <!--img src="{{patientimg}}" alt="My Image"-->
+    <form action="/doctoruserpage" method="post"> 
+    内容:<br>
+    <input type="text" name="content" >
+    <br><br>
+<input type="hidden" name="openid" value="{{open_id}}">
+    <input type="submit" value="Submit">
+
+    </form>
 </body>
 </html>
