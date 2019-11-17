@@ -11,12 +11,14 @@
 身高:{{user.height}}<br>
 体重:{{user.weight}}<br>
 性别:{{user.gender}}<br>
-{{
-for daytimedata in daytimedatas:
-    "舒张压:"+daytimedata.diastolic_pressure+"收缩压:"+daytimedata.systolic_pressure
-    +"心律:"+daytimedata.rhythm_of_heart+"日期:"+daytimedata.datetime
 
-}}
+每日数据:<br>
+{%for daytimedata in daytimedatas:%}
+    {{daytimedata.datetime}}   舒张压:{{daytimedata.diastolic_pressure}}    收缩压: {{daytimedata.systolic_pressure}}
+  心律:{{daytimedata.rhythm_of_heart}}<br>
+{%endfor%}
+
+
 <br>
     <!--img src="{{patientimg}}" alt="My Image"-->
     <form action="/doctoruserpage" method="post"> 

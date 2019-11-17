@@ -238,6 +238,7 @@ def registertest():
 
 @app.route("/getqrcode", methods=['GET'])
 def getuserqrcode():
+    # pdb.set_trace()
     openid = request.args.get('openid')
     print("getuserqrcode:openid"+openid)
     user = User.query.filter_by(open_id=openid).first_or_404()
