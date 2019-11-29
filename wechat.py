@@ -19,21 +19,29 @@ from app.forms import RegisterForm,DailyCheckForm
 from app.models import User,Daytimecheckdata
 
 import qrcode
+import threading
 
 
 
 class wechatrequest():
     def __init__(self):
         self._wxaccesstoken=""
+        checkthread = threading.Thread(target=self.checkupdatedbfile)
+        checkthread.start()
 
+    def checkupdatedbfile(self):
+        while(True):
+            time.sleep(3600)
+            self.get_accesstoken()
+            logging.info("timer get access_token :"+self._wxaccesstoken)
 
     def get_accesstoken(self):
-        if self._wxaccesstoken != "":
-            return self._wxaccesstoken
+        #if self._wxaccesstoken != "":
+        #    return self._wxaccesstoken
         resp = requests.get(
             "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + WECHAT_APPID + "&secret=" + WECHAT_APPSECRET)
         if resp.status_code != 200:
-            print("request error"+resp.status_code)
+            logging.info("request error"+resp.status_code)
             return ""
         retdict = json.loads(resp.text)
         self._wxaccesstoken = retdict["access_token"]
@@ -56,8 +64,8 @@ class wechatrequest():
     def sendwxmessagetouser(self,open_id,content):
         url = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=%s" \
               % (self._wxaccesstoken)
-        # print(content)
-        # print(type(content))
+        # logging.info(content)
+        # logging.info(type(content))
         senddata='{  \
         "touser":"%s", \
         "msgtype":"text",   \
@@ -66,11 +74,11 @@ class wechatrequest():
         jsonsendstr=senddata.encode("utf-8")
         headers = {'Content-Type': 'application/json;encoding=utf-8'}
         response = requests.post(url,jsonsendstr,headers=headers)
-        print("post url"+url+"senddata:"+senddata+"response:"+response.text)
+        logging.info("post url"+url+"senddata:"+senddata+"response:"+response.text)
 
         jsondict=json.loads(response.text)
         if jsondict.get("errcode")==41001:
-            print(jsondict.get("errmsg"))
+            logging.info(jsondict.get("errmsg"))
             self.get_accesstoken()
             response = requests.post(url, jsonsendstr,headers=headers)
 
@@ -78,16 +86,18 @@ class wechatrequest():
         files = {'media': open(filename, 'rb')}
         url = "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=image"% (self._wxaccesstoken)
         rsp = requests.post(url, files=files)
-        print(rsp.text)
-        if self.checktoken(self,rsp.text):
+        logging.info(rsp.text)
+        if self.checktoken(json.loads(rsp.text)):
+            url = "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=image"% (self._wxaccesstoken)
             rsp = requests.post(url, files=files)
-            print(rsp.text)
+            logging.info("get token and resend "+rsp.text)
 
         return rsp.text
 
     def checktoken(self,jsondict):
+
         if jsondict.get("errcode")==41001 or jsondict.get("errcode")==42001:
-            print(jsondict.get("errmsg"))
+            logging.info(jsondict.get("errmsg"))
             self.get_accesstoken()
             return True
         else:
@@ -108,7 +118,7 @@ def wechat():
     signature = request.args.get("signature")
     timestamp = request.args.get("timestamp")
     nonce = request.args.get("nonce")
-    print("signature"+signature)
+    logging.info("signature"+signature)
 #    pdb.set_trace()
 
     # 校验参数
@@ -127,8 +137,8 @@ def wechat():
     # 将自己计算的签名值与请求的签名参数进行对比，如果相同，则证明请求来自微信服务器
     if signature != sign:
         # 表示请求不是微信发的
-        # print("my sign:"+sign)
-	    # print("wechat sign:"+signature)
+        # logging.info("my sign:"+sign)
+	    # logging.info("wechat sign:"+signature)
         abort(403)
     else:
         # 表示是微信发送的请求
@@ -164,7 +174,7 @@ def wechat():
                     }
                 }
             elif msg_type=="event":
-                print("event")
+                logging.info("event")
                 openid=xml_dict.get("FromUserName")
                 createqrcode(openid)
                 rspjson=g_wxreq.send_tmp_media("resources/"+openid+".jpg")
@@ -194,7 +204,7 @@ def wechat():
 
             # 将字典转换为xml字符串
             resp_xml_str = xmltodict.unparse(resp_dict)
-            print(resp_xml_str)
+            logging.info("response value:"+resp_xml_str)
             # 返回消息数据给微信服务器
             return resp_xml_str
 
@@ -240,7 +250,7 @@ def registertest():
 def getuserqrcode():
     # pdb.set_trace()
     openid = request.args.get('openid')
-    print("getuserqrcode:openid"+openid)
+    logging.info("getuserqrcode:openid"+openid)
     user = User.query.filter_by(open_id=openid).first_or_404()
     daytimedatas=Daytimecheckdata.query.filter_by(identity_id=user.identity_id)
     #patientimg="resources/"+openid+"jpg"
@@ -249,7 +259,7 @@ def getuserqrcode():
 def createqrcode(open_id):
     url=app.config["HOST"]+"getqrcode?openid="+open_id
 
-    print("createqrcodeurl:" + url)
+    logging.info("createqrcodeurl:" + url)
     img = qrcode.make(url)
     img.save("resources/"+open_id+".jpg")
     return url
@@ -259,7 +269,7 @@ def createqrcode(open_id):
 def register():
     # pdb.set_trace()
     form = RegisterForm()
-    print(request.args)
+    logging.info(request.args)
     openid=request.args.get("wxopenid")
     identification=request.args.get("identification")
     email=request.args.get("email")
@@ -276,7 +286,7 @@ def register():
            db.session.commit()
            return redirect('/after_register')
         except Exception as e:
-            print(e)
+            logging.info(e)
             return str(e)
 
 
@@ -292,7 +302,7 @@ def registerpost():
     if form.validate_on_submit():
         flash('Login requested for user {}, remember_me={}'.format(
             form.name.data, form.wxopenid.data))
-        print(form.name.data+form.wxopenid.data)
+        logging.info(form.name.data+form.wxopenid.data)
         user=User(name=form.name.data,identity_id=form.identification.data,open_id=form.wxopenid.data,email=form.email.data)
         db.session.add(user)
         db.session.commit()
@@ -310,7 +320,7 @@ def dailycheck():
         flash('Login requested for user {}, remember_me={}'.format(
             form.identification.data, form.diastolic_pressure.data))
         try:
-            print(form.identification.data)
+            logging.info(form.identification.data)
             dailycheckdata=Daytimecheckdata(diastolic_pressure = form.diastolic_pressure.data
                                         ,systolic_pressure=form.systolic_pressure.data,
                                         identity_id=form.identification.data,
@@ -345,7 +355,7 @@ def dailycheck():
 #        flash('Login requested for user {}, remember_me={}'.format(
 #            form.identification.data, form.diastolic_pressure.data))
 #        try:
-#            print(form.identification.data)
+#            logging.info(form.identification.data)
 #            dailycheckdata=Daytimecheckdata(diastolic_pressure = form.diastolic_pressure.data
 #                                        ,systolic_pressure=form.systolic_pressure.data,
 #                                        identity_id=form.identification.data,
@@ -384,14 +394,14 @@ def index():
     if not code:
         return u"缺失code参数"
 
-    #print("code:"+code)
+    #logging.info("code:"+code)
 
     # 2. 向微信服务器发送http请求，获取access_token
     url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code" \
           % (WECHAT_APPID, WECHAT_APPSECRET, code)
 #http.client.HTTPConnection("192.168.73.21",9091)
 
-    #print("in index:"+url)
+    logging.info("in index:"+url)
     # 使用urllib2的urlopen方法发送请求
     # 如果只传网址url参数，则默认使用http的get请求方式, 返回响应对象
     response = requests.get(url)
@@ -399,14 +409,14 @@ def index():
     # 获取响应体数据,微信返回的json数据
     json_str = response.text
     resp_dict = json.loads(json_str)
-    print("json_str:"+json_str)
+    logging.info("json_str:"+json_str)
     # 提取access_token
     if "errcode" in resp_dict:
         return u"获取access_token失败"
 
     access_token = resp_dict.get("access_token")
     open_id = resp_dict.get("openid")  # 用户的编号
-    print("open_id"+open_id)
+    logging.info("open_id"+open_id)
     # 3. 向微信服务器发送http请求，获取用户的资料数据
     url = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN" \
           % (access_token, open_id)
@@ -418,7 +428,7 @@ def index():
     #pdb.set_trace()
     user_json_str = response.text
     user_dict_data = json.loads(user_json_str)
-    print("userinfo:"+user_json_str)
+    logging.info("userinfo:"+user_json_str)
     if "errcode" in user_dict_data:
         return u"获取用户信息失败"+user_dict_data["errmsg"]
     else:
@@ -445,7 +455,7 @@ def testinterface():
     usertokenresponse = requests.get(
         'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx2a2283f465f7f68a&secret=8c2e9217f7f608c2e040ba68cc788fab',
         auth=('user', 'pass'))
-    print(usertokenresponse)
+    logging.info(usertokenresponse)
 
     # if usertokenresponse.status_code!=200:
     #     return
@@ -455,20 +465,27 @@ def testinterface():
 
     userlistresponse = requests.get(
         'https://api.weixin.qq.com/cgi-bin/user/get?access_token=' + access_tokenstr)
-    print(userlistresponse)
+    logging.info(userlistresponse)
 
     userinforesponse = requests.get(
         'https://api.weixin.qq.com/cgi-bin/user/info?access_token=' + access_tokenstr + '&openid=oCE0-wNsOEzivCjtXhIvA3iL2ieg&lang=zh_CN')
     pdb.set_trace()
 
-    print(userinforesponse.text)
+    logging.info(userinforesponse.text)
 
 
+
+#def runapp():
+#    app.run(host="0.0.0.0",port=80, debug=True)
 
 
 if __name__ == '__main__':
     #testinterface()
     #g_wxreq.send_tmp_media(r"H:\ccppworkspace\imageprocess\Project1\lena_top.jpg")
     infostr='{"openid":"oCE0-wNsOEzivCjtXhIvA3iL2ieg","nickname":"望尘莫及","sex":1,"language":"en","city":"杭州","province":"浙江","country":"中国","headimgurl":"http:\/\/thirdwx.qlogo.cn\/mmopen\/vi_32\/Q0j4TwGTfTKXzUU0bIPQWC6Xia07jenOIeoyEdNNyqEHMia1ZArFP01mXWB5DD2qzyIM3mwGy7IsiaK896icICRYuw\/132","privilege":[]}'
-    logging.basicConfig(filename='medicallog.log',level=logging.DEBUG)
-    app.run(host="0.0.0.0",port=80, debug=True)
+    ts = time.time()
+    logging.basicConfig(filename='log/medicallog'+str(ts)+'.log',level=logging.INFO)
+    try:
+        app.run(host="0.0.0.0",port=80, debug=True)
+    except Exception as e:
+        logging.exception(e)
