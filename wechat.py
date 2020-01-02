@@ -156,6 +156,7 @@ def wechat():
 
             # 对xml字符串进行解析
             xml_dict = xmltodict.parse(xml_str)
+            print(xml_str)
             xml_dict = xml_dict.get("xml")
 
             # 提取消息类型
@@ -173,24 +174,42 @@ def wechat():
                         "Content": xml_dict.get("Content")
                     }
                 }
+
             elif msg_type=="event":
                 logging.info("event")
-                openid=xml_dict.get("FromUserName")
-                createqrcode(openid)
-                rspjson=g_wxreq.send_tmp_media("resources/"+openid+".jpg")
-                rspdict=json.loads(rspjson)
-                resp_dict = {
-                    "xml": {
-                        "ToUserName": xml_dict.get("FromUserName"),
-                        "FromUserName": xml_dict.get("ToUserName"),
-                        "CreateTime": int(time.time()),
-                        "MsgType": "image",
-                        "Image":{
-                            "MediaId":rspdict["media_id"]
+                if xml_dict.get("EventKey") == "my_medical_plan":
+                    openid=xml_dict.get("FromUserName")
+                    createqrcode(openid)
+                    rspjson=g_wxreq.send_tmp_media("resources/"+openid+".jpg")
+                    rspdict=json.loads(rspjson)
+                    resp_dict = {
+                        "xml": {
+                            "ToUserName": xml_dict.get("FromUserName"),
+                            "FromUserName": xml_dict.get("ToUserName"),
+                            "CreateTime": int(time.time()),
+                            "MsgType": "event",
+                            "Event":"VIEW",
+                            "EventKey":"www.qq.com"
+
                         }
                     }
-                }
 
+                else:
+                    openid=xml_dict.get("FromUserName")
+                    createqrcode(openid)
+                    rspjson=g_wxreq.send_tmp_media("resources/"+openid+".jpg")
+                    rspdict=json.loads(rspjson)
+                    resp_dict = {
+                        "xml": {
+                            "ToUserName": xml_dict.get("FromUserName"),
+                            "FromUserName": xml_dict.get("ToUserName"),
+                            "CreateTime": int(time.time()),
+                            "MsgType": "image",
+                            "Image":{
+                                "MediaId":rspdict["media_id"]
+                            }
+                        }
+                    }
             else:
                 resp_dict = {
                     "xml": {
@@ -314,6 +333,8 @@ def registerpost():
 
 @app.route("/dailycheck", methods=['GET', 'POST'])
 def dailycheck():
+    openid = request.args.get('open_id')
+    print("in dailycheck openid="+openid)
     form = DailyCheckForm()
 
     if form.validate_on_submit():
@@ -389,8 +410,10 @@ def index():
     """让用户通过微信访问的网页页面视图"""
     # 从微信服务器中拿去用户的资料数据
     # 1. 拿去code参数
+    print(request.args)
     code = request.args.get("code")
-
+    state = request.args.get("state")
+    print("state:"+str(state))
     if not code:
         return u"缺失code参数"
 
@@ -400,7 +423,6 @@ def index():
     url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code" \
           % (WECHAT_APPID, WECHAT_APPSECRET, code)
 #http.client.HTTPConnection("192.168.73.21",9091)
-
     logging.info("in index:"+url)
     # 使用urllib2的urlopen方法发送请求
     # 如果只传网址url参数，则默认使用http的get请求方式, 返回响应对象
@@ -417,28 +439,33 @@ def index():
     access_token = resp_dict.get("access_token")
     open_id = resp_dict.get("openid")  # 用户的编号
     logging.info("open_id"+open_id)
-    # 3. 向微信服务器发送http请求，获取用户的资料数据
-    url = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN" \
-          % (access_token, open_id)
 
-    response = requests.get(url)
-    response.encoding = 'utf-8'
-    #data = response.json()
-    # 读取微信传回的json的响应体数据
-    #pdb.set_trace()
-    user_json_str = response.text
-    user_dict_data = json.loads(user_json_str)
-    logging.info("userinfo:"+user_json_str)
-    if "errcode" in user_dict_data:
-        return u"获取用户信息失败"+user_dict_data["errmsg"]
+    if state=="2":
+        print("already register")
+        return redirect("/dailycheck?open_id="+open_id)
     else:
-        # 将用户的资料数据填充到页面中
-        #return render_template("index.html", user=user_dict_data)
-        form = RegisterForm()
-        form.wxopenid.data=open_id
-        form.json_user_info=user_json_str
-        form.sex.data=user_dict_data["sex"]
-        return render_template('register.html', form=form,nkname=user_json_str)
+        # 3. 向微信服务器发送http请求，获取用户的资料数据
+        url = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN" \
+            % (access_token, open_id)
+
+        response = requests.get(url)
+        response.encoding = 'utf-8'
+        #data = response.json()
+        # 读取微信传回的json的响应体数据
+        #pdb.set_trace()
+        user_json_str = response.text
+        user_dict_data = json.loads(user_json_str)
+        logging.info("userinfo:"+user_json_str)
+        if "errcode" in user_dict_data:
+            return u"获取用户信息失败"+user_dict_data["errmsg"]
+        else:
+            # 将用户的资料数据填充到页面中
+            #return render_template("index.html", user=user_dict_data)
+            form = RegisterForm()
+            form.wxopenid.data=open_id
+            form.json_user_info=user_json_str
+            form.sex.data=user_dict_data["sex"]
+            return render_template('register.html', form=form,nkname=user_json_str)
 
 
 
