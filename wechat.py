@@ -17,6 +17,7 @@ import logging
 from app.context import app,WECHAT_TOKEN,WECHAT_APPID,WECHAT_APPSECRET,db
 from app.forms import RegisterForm,DailyCheckForm
 from app.models import User,Daytimecheckdata
+from app.drawimg import drawlinegraph
 
 import qrcode
 import threading
@@ -95,7 +96,6 @@ class wechatrequest():
         return rsp.text
 
     def checktoken(self,jsondict):
-
         if jsondict.get("errcode")==41001 or jsondict.get("errcode")==42001:
             logging.info(jsondict.get("errmsg"))
             self.get_accesstoken()
@@ -265,6 +265,7 @@ def registertest():
     return render_template('register.html', form=form,nkname="haha")
 
 
+# userinfo page
 @app.route("/getqrcode", methods=['GET'])
 def getuserqrcode():
     # pdb.set_trace()
@@ -272,6 +273,15 @@ def getuserqrcode():
     logging.info("getuserqrcode:openid"+openid)
     user = User.query.filter_by(open_id=openid).first_or_404()
     daytimedatas=Daytimecheckdata.query.filter_by(identity_id=user.identity_id)
+    # dates=[dayinfo.rhythm_of_heart for dayinfo in daytimedatas]
+    dates=[]
+    rhythm_of_hearts=[]
+    for dayinfo in daytimedatas:
+        dates.append(dayinfo.datetime)
+        rhythm_of_hearts.append(dayinfo.rhythm_of_heart)
+
+    imgname=openid + "_rhythm_of_heart.jpg"
+    drawlinegraph(dates,rhythm_of_hearts,"日期","心率",imgname)
     #patientimg="resources/"+openid+"jpg"
     return render_template('patientqrcode.html',user=user,daytimedatas=daytimedatas)
 
