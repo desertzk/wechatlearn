@@ -1,11 +1,13 @@
 # coding:utf-8
+import io
 import pdb
 import os.path
+import random
 import sys
 import urllib.parse
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 #import http.client, urllib.parse
-from flask import Flask, request, abort, render_template,redirect,flash
+from flask import Flask, request, abort, render_template, redirect, flash, Response
 import hashlib
 import xmltodict
 import time
@@ -13,7 +15,7 @@ import time
 import json
 import requests
 import logging
-
+from urllib.parse import quote
 from app.context import app,WECHAT_TOKEN,WECHAT_APPID,WECHAT_APPSECRET,db
 from app.forms import RegisterForm,DailyCheckForm
 from app.models import User,Daytimecheckdata
@@ -21,6 +23,13 @@ from app.drawimg import drawlinegraph
 
 import qrcode
 import threading
+import base64
+
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.backends.backend_svg import FigureCanvasSVG
+
+from matplotlib.figure import Figure
+
 
 
 
@@ -274,16 +283,108 @@ def getuserqrcode():
     user = User.query.filter_by(open_id=openid).first_or_404()
     daytimedatas=Daytimecheckdata.query.filter_by(identity_id=user.identity_id)
     # dates=[dayinfo.rhythm_of_heart for dayinfo in daytimedatas]
+
     dates=[]
     rhythm_of_hearts=[]
     for dayinfo in daytimedatas:
         dates.append(dayinfo.datetime)
         rhythm_of_hearts.append(dayinfo.rhythm_of_heart)
 
-    imgname=openid + "_rhythm_of_heart.jpg"
-    drawlinegraph(dates,rhythm_of_hearts,"日期","心率",imgname)
-    #patientimg="resources/"+openid+"jpg"
-    return render_template('patientqrcode.html',user=user,daytimedatas=daytimedatas)
+    output = drawlinegraph(dates,rhythm_of_hearts,"date","rhythm_of_heart")
+    imgdata = "data:image/png;base64,"+base64.b64encode(output.getvalue()).decode("utf-8")
+
+    return render_template('patientqrcode.html',user=user,daytimedatas=daytimedatas,num_x_points=50,imgdata=imgdata)
+
+
+@app.route("/see")
+def see():
+    """ Returns html with the img tag for your plot.
+    """
+    num_x_points = int(request.args.get("num_x_points", 50))
+    # in a real app you probably want to use a flask template.
+    # return f"""
+    # <h1>Flask and matplotlib</h1>
+    # <h2>Random data with num_x_points={num_x_points}</h2>
+    # <form method=get action="/">
+    #   <input name="num_x_points" type=number value="{num_x_points}" />
+    #   <input type=submit value="update graph">
+    # </form>
+    # <h3>Plot as a png</h3>
+    # <img src="/matplot-as-image-{num_x_points}.png"
+    #      alt="random points as png"
+    #      height="200"
+    # >
+    # <h3>Plot as a SVG</h3>
+    # <img src="/matplot-as-image-{num_x_points}.svg"
+    #      alt="random points as svg"
+    #      height="200"
+    # >
+    # """
+    # from flask import render_template
+    return render_template("image.html", num_x_points=num_x_points)
+
+
+@app.route("/matplot-as-image-<string:open_id>.png")
+def plot_newpng(open_id):
+    """ renders the plot on the fly.
+    """
+    user = User.query.filter_by(open_id=open_id).first_or_404()
+    daytimedatas=Daytimecheckdata.query.filter_by(identity_id=user.identity_id)
+    # dates=[dayinfo.rhythm_of_heart for dayinfo in daytimedatas]
+    dates=[]
+    rhythm_of_hearts=[]
+    for dayinfo in daytimedatas:
+        dates.append(dayinfo.datetime)
+        rhythm_of_hearts.append(dayinfo.rhythm_of_heart)
+
+    output = drawlinegraph(dates,rhythm_of_hearts,"date","rhythm_of_heart")
+    return Response(output.getvalue(), mimetype="image/png")
+
+
+@app.route("/matplot-as-image-<int:num_x_points>.png")
+def plot_png(num_x_points=50):
+    """ renders the plot on the fly.
+    """
+    fig = Figure()
+    axis = fig.add_subplot(1, 1, 1)
+    x_points = range(num_x_points)
+    axis.plot(x_points, [random.randint(1, 30) for x in x_points])
+
+    output = io.BytesIO()
+    FigureCanvasAgg(fig).print_png(output)
+    return Response(output.getvalue(), mimetype="image/png")
+
+
+@app.route("/matplot-as-image-<int:num_x_points>.svg")
+def plot_svg(num_x_points=50):
+    """ renders the plot on the fly.
+    """
+    fig = Figure()
+    axis = fig.add_subplot(1, 1, 1)
+    x_points = range(num_x_points)
+    axis.plot(x_points, [random.randint(1, 30) for x in x_points])
+
+    output = io.BytesIO()
+    FigureCanvasSVG(fig).print_svg(output)
+    return Response(output.getvalue(), mimetype="image/svg+xml")
+
+@app.route('/image')
+def image():
+    return render_template("image.html")
+
+
+
+def create_figure():
+    fig = Figure()
+    axis = fig.add_subplot(1, 1, 1)
+    xs = range(100)
+    ys = [random.randint(1, 50) for x in xs]
+    axis.plot(xs, ys)
+    return fig
+
+
+
+
 
 def createqrcode(open_id):
     url=app.config["HOST"]+"getqrcode?openid="+open_id

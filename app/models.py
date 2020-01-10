@@ -1,3 +1,4 @@
+# coding:utf-8
 from .context import db
 import enum
 import os

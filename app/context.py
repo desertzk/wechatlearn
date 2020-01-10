@@ -1,3 +1,4 @@
+# coding:utf-8
 from flask import Flask,current_app
 from flask_sqlalchemy import SQLAlchemy
 
@@ -9,7 +10,7 @@ WECHAT_APPSECRET = "8c2e9217f7f608c2e040ba68cc788fab"
 
 
 
-app = Flask(__name__,static_folder='../static', template_folder='../templates')
+app = Flask(__name__,static_folder='../resources', template_folder='../templates')
 
 
 app.config.from_pyfile("../config/config.cfg")
