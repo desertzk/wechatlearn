@@ -18,22 +18,22 @@ from matplotlib.figure import Figure
 # plt.show()
 
 
-fig = Figure()
-# axis = fig.add_subplot(1, 1, 1)
-dates = [pd.to_datetime(d) for d in ["2019-01-01","2019-02-01","2019-03-01","2019-04-01","2019-10-01"]]
-plt.plot(dates, [67,68,69,70,79])
-# plt.savefig(fig, format='png')
-plt.xlabel("xaxis")
-plt.ylabel("yaxis")
-plt.xticks(rotation=15)
+# fig = Figure()
+# # axis = fig.add_subplot(1, 1, 1)
+# dates = [pd.to_datetime(d) for d in ["2019-01-01","2019-02-01","2019-03-01","2019-04-01","2019-10-01"]]
+# plt.plot(dates, [67,68,69,70,79])
+# # plt.savefig(fig, format='png')
+# plt.xlabel("xaxis")
+# plt.ylabel("yaxis")
+# plt.xticks(rotation=15)
+#
+# plt.show()
 
-plt.show()
 
-
-def drawlinegraph(dates,value,xaxis,yaxis):
+def drawlinegraph(dates,values,xaxis,yaxis):
     # try:
-    dates = [pd.to_datetime(d) for d in ["2019-01-01", "2019-02-01", "2019-03-01", "2019-04-01", "2019-10-01"]]
-    plt.plot(dates, [67, 68, 69, 70, 79])
+    # dates = [pd.to_datetime(d) for d in ["2019-01-01", "2019-02-01", "2019-03-01", "2019-04-01", "2019-10-01"]]
+    plt.plot(dates, values)
     # plt.savefig(fig, format='png')
     plt.xlabel("xaxis")
     plt.ylabel("yaxis")
