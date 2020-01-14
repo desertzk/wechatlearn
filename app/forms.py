@@ -41,7 +41,7 @@ class WeightRecordForm(FlaskForm):
     submit = SubmitField('提交')
 
 
-class BloodPressuretRecordForm(FlaskForm):
+class BloodPressureRecordForm(FlaskForm):
     diastolic_pressure = IntegerField('舒张压')
     systolic_pressure = IntegerField('收缩压')
     submit = SubmitField('提交')

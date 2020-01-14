@@ -17,7 +17,7 @@ import requests
 import logging
 from urllib.parse import quote
 from app.context import app,WECHAT_TOKEN,WECHAT_APPID,WECHAT_APPSECRET,db
-from app.forms import RegisterForm,DailyCheckForm
+from app.forms import RegisterForm,DailyCheckForm,WeightRecordForm,BloodPressureRecordForm
 from app.models import User,Daytimecheckdata
 from app.drawimg import drawlinegraph
 
@@ -238,9 +238,10 @@ def wechat():
 
 
 
-@app.route("/")
+@app.route("/index")
 def mainpage():
-    return render_template('index.html')
+    open_id = request.args.get("open_id")
+    return render_template('index.html',open_id=open_id)
 
 @app.route("/sendtouserpage", methods=['GET', 'POST'])
 def sendtouserpage():
@@ -441,6 +442,27 @@ def registerpost():
     return render_template('register.html', form=form,nkname="haha")
 
 
+@app.route("/weight_info_record", methods=['GET', 'POST'])
+def weight_info_record():
+    openid = request.args.get('open_id')
+    print("in dailycheck openid="+openid)
+    userinfo = User.query.filter_by(open_id=openid).first_or_404()
+    form=request.form
+    try:
+        logging.info(form.get("weight"))
+        dailycheckdata = Daytimecheckdata(weight=form.get("weight"),identity_id=userinfo.identity_id)
+        db.session.add(dailycheckdata)
+        db.session.commit()
+
+        return "成功"
+    except Exception as ex:
+        exstr = str(ex)
+        print(exstr)
+        if "Duplicate entry" in exstr:
+            return "不许重复录入"
+        return str(ex)
+
+
 
 @app.route("/weight_info", methods=['GET', 'POST'])
 def weight_info():
@@ -449,13 +471,10 @@ def weight_info():
     form = WeightRecordForm()
 
     if form.validate_on_submit():
-        flash('Login requested for user {}, remember_me={}'.format(
-            form.identification.data, form.diastolic_pressure.data))
         try:
-            logging.info(form.identification.data)
-            dailycheckdata=Daytimecheckdata(
-                                        weight=form.weight.data)
-            db.session.add(dailycheckdata)
+            logging.info(form.weight.data)
+            dailycheckdata=Daytimecheckdata(weight=form.weight.data)
+            db.session.merge(dailycheckdata)
             db.session.commit()
 
             return "成功"
@@ -466,7 +485,7 @@ def weight_info():
             return str(ex)
 
 
-    return render_template('dailycheck.html', form=form,nkname="haha")
+    return render_template('weight_info.html', form=form,open_id=openid)
 
 
 

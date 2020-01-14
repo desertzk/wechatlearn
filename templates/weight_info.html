@@ -6,11 +6,11 @@
 </head>
 <body>
     <form action="/weight_info_record?open_id={{open_id}}" method="post" novalidate>
-        {{ form.hidden_tag() }}
-                <p>
-            {{ form.identification.label }}<br>
-            {{ form.identification(size=32) }}
+     <p>
+            {{ form.weight.label }}
+            {{ form.weight(size=10) }}<br>
         </p>
+        <p>{{ form.submit() }}</p>
     </form>
 </body>
 </html>
