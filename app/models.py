@@ -37,6 +37,7 @@ class Daytimecheckdata(db.Model):
     systolic_pressure = db.Column(db.Integer)
     rhythm_of_heart = db.Column(db.Integer)
     medicines_list = db.Column(db.String(256))
+    weight=db.Column(db.DECIMAL(10,2))
    # visit_time = db.Column(db.Integer)
    # triglyceride = db.Column(db.DECIMAL(10,2))
    # total_cholesterol=db.Column(db.DECIMAL(10,2))

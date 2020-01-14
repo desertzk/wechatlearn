@@ -442,6 +442,36 @@ def registerpost():
 
 
 
+@app.route("/weight_info", methods=['GET', 'POST'])
+def weight_info():
+    openid = request.args.get('open_id')
+    print("in dailycheck openid="+openid)
+    form = WeightRecordForm()
+
+    if form.validate_on_submit():
+        flash('Login requested for user {}, remember_me={}'.format(
+            form.identification.data, form.diastolic_pressure.data))
+        try:
+            logging.info(form.identification.data)
+            dailycheckdata=Daytimecheckdata(
+                                        weight=form.weight.data)
+            db.session.add(dailycheckdata)
+            db.session.commit()
+
+            return "成功"
+        except Exception as ex:
+            exstr=str(ex)
+            if "Duplicate entry" in exstr:
+                return "不许重复录入"
+            return str(ex)
+
+
+    return render_template('dailycheck.html', form=form,nkname="haha")
+
+
+
+
+
 @app.route("/dailycheck", methods=['GET', 'POST'])
 def dailycheck():
     openid = request.args.get('open_id')
