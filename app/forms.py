@@ -35,6 +35,30 @@ class DailyCheckForm(FlaskForm):
     # remember_me = BooleanField('Remember Me')
     submit = SubmitField('提交')
 
+
+class WeightRecordForm(FlaskForm):
+    weight = DecimalField('体重')
+    submit = SubmitField('提交')
+
+
+class BloodPressuretRecordForm(FlaskForm):
+    diastolic_pressure = IntegerField('舒张压')
+    systolic_pressure = IntegerField('收缩压')
+    submit = SubmitField('提交')
+
+
+class HeartRateRecordForm(FlaskForm):
+    rhythm_of_heart = IntegerField('心率')
+    submit = SubmitField('提交')
+
+
+class MedicineForm(FlaskForm):
+    medicines_list = StringField('药物清单')
+    submit = SubmitField('提交')
+
+
+
+
 # class RegisterForm(FlaskForm):
 #     name = StringField('姓名', validators=[DataRequired()])
 #     identification = StringField('身份证', validators=[DataRequired()])
