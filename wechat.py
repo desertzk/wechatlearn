@@ -15,6 +15,7 @@ import time
 import json
 import requests
 import logging
+from datetime import datetime
 from urllib.parse import quote
 from app.context import app,WECHAT_TOKEN,WECHAT_APPID,WECHAT_APPSECRET,db
 from app.forms import RegisterForm,DailyCheckForm,WeightRecordForm,BloodPressureRecordForm
@@ -450,13 +451,21 @@ def weight_info_record():
     form=request.form
     try:
         logging.info(form.get("weight"))
-        dailycheckdata = Daytimecheckdata(weight=form.get("weight"),identity_id=userinfo.identity_id)
-        db.session.add(dailycheckdata)
+        daycheck = db.session.query(Daytimecheckdata).filter_by(identity_id=userinfo.identity_id,
+                                                    datetime=datetime.today().strftime("%Y-%m-%d")).first()
+        if daycheck!=None:
+            daycheck.weight = form.get("weight")
+        else:
+            dailycheckdata = Daytimecheckdata(weight=form.get("weight"),identity_id=userinfo.identity_id)
+            db.session.add(dailycheckdata)
+
+
         db.session.commit()
 
         return "成功"
     except Exception as ex:
         exstr = str(ex)
+
         print(exstr)
         if "Duplicate entry" in exstr:
             return "不许重复录入"
