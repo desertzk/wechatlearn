@@ -479,22 +479,89 @@ def weight_info():
     print("in dailycheck openid="+openid)
     form = WeightRecordForm()
 
-    if form.validate_on_submit():
-        try:
-            logging.info(form.weight.data)
-            dailycheckdata=Daytimecheckdata(weight=form.weight.data)
-            db.session.merge(dailycheckdata)
-            db.session.commit()
-
-            return "成功"
-        except Exception as ex:
-            exstr=str(ex)
-            if "Duplicate entry" in exstr:
-                return "不许重复录入"
-            return str(ex)
-
-
     return render_template('weight_info.html', form=form,open_id=openid)
+
+
+
+@app.route("/blood_pressure_record", methods=['GET', 'POST'])
+def blood_pressure_record():
+    openid = request.args.get('open_id')
+    print("in dailycheck openid="+openid)
+    userinfo = User.query.filter_by(open_id=openid).first_or_404()
+    form=request.form
+    try:
+
+        daycheck = db.session.query(Daytimecheckdata).filter_by(identity_id=userinfo.identity_id,
+                                                    datetime=datetime.today().strftime("%Y-%m-%d")).first()
+        if daycheck!=None:
+            daycheck.systolic_pressure = form.get("systolic_pressure")
+            daycheck.diastolic_pressure = form.get("diastolic_pressure")
+        else:
+            dailycheckdata = Daytimecheckdata(systolic_pressure=form.get("systolic_pressure"),diastolic_pressure=form.get("diastolic_pressure"),identity_id=userinfo.identity_id)
+            db.session.add(dailycheckdata)
+
+
+        db.session.commit()
+
+        return "成功"
+    except Exception as ex:
+        exstr = str(ex)
+
+        print(exstr)
+        if "Duplicate entry" in exstr:
+            return "不许重复录入"
+        return str(ex)
+
+
+
+@app.route("/blood_pressure_info", methods=['GET', 'POST'])
+def blood_pressure_info():
+    openid = request.args.get('open_id')
+    print("in dailycheck openid="+openid)
+    form = BloodPressureRecordForm()
+
+    return render_template('blood_pressure_info.html', form=form,open_id=openid)
+
+
+
+@app.route("/heart_rate_record", methods=['GET', 'POST'])
+def heart_rate_record():
+    openid = request.args.get('open_id')
+    print("in dailycheck openid="+openid)
+    userinfo = User.query.filter_by(open_id=openid).first_or_404()
+    form=request.form
+    try:
+
+        daycheck = db.session.query(Daytimecheckdata).filter_by(identity_id=userinfo.identity_id,
+                                                    datetime=datetime.today().strftime("%Y-%m-%d")).first()
+        if daycheck!=None:
+            daycheck.rhythm_of_heart = form.get("rhythm_of_heart")
+        else:
+            dailycheckdata = Daytimecheckdata(rhythm_of_heart=form.get("rhythm_of_heart"),identity_id=userinfo.identity_id)
+            db.session.add(dailycheckdata)
+
+
+        db.session.commit()
+
+        return "成功"
+    except Exception as ex:
+        exstr = str(ex)
+
+        print(exstr)
+        if "Duplicate entry" in exstr:
+            return "不许重复录入"
+        return str(ex)
+
+
+
+@app.route("/heart_rate_info", methods=['GET', 'POST'])
+def heart_rate_info():
+    openid = request.args.get('open_id')
+    print("in dailycheck openid="+openid)
+    form = HeartRateRecordForm()
+
+    return render_template('heart_rate_info.html', form=form,open_id=openid)
+
 
 
 

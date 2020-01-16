@@ -5,6 +5,12 @@
     <title>Title</title>
 </head>
 <body>
-
+    <form action="/heart_rate_record?open_id={{open_id}}" method="post" novalidate>
+     <p>
+            {{ form.rhythm_of_heart.label }}
+            {{ form.rhythm_of_heart(size=10) }}<br>
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
 </body>
 </html>

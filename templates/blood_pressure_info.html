@@ -5,6 +5,16 @@
     <title>Title</title>
 </head>
 <body>
-
+    <form action="/blood_pressure_record?open_id={{open_id}}" method="post" novalidate>
+     <p>
+            {{ form.diastolic_pressure.label }}
+            {{ form.diastolic_pressure(size=10) }}<br>
+        </p>
+        <p>
+            {{ form.systolic_pressure.label }}
+            {{ form.systolic_pressure(size=10) }}<br>
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
 </body>
 </html>
