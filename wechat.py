@@ -611,7 +611,7 @@ def index():
 
     if state=="2":
         print("already register")
-        return render_template("/index.html?open_id="+open_id)
+        return render_template("index.html",open_id=open_id)
     else:
         # 3. 向微信服务器发送http请求，获取用户的资料数据
         url = "https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN" \
@@ -682,6 +682,6 @@ if __name__ == '__main__':
     ts = time.time()
     logging.basicConfig(filename='log/medicallog'+str(ts)+'.log',level=logging.INFO)
     try:
-        app.run(host="0.0.0.0",port=8000, debug=True)
+        app.run(host="0.0.0.0",port=80, debug=True)
     except Exception as e:
         logging.exception(e)
