@@ -18,7 +18,7 @@ import logging
 from datetime import datetime
 from urllib.parse import quote
 from app.context import app,WECHAT_TOKEN,WECHAT_APPID,WECHAT_APPSECRET,db
-from app.forms import RegisterForm,DailyCheckForm,WeightRecordForm,BloodPressureRecordForm
+from app.forms import RegisterForm,DailyCheckForm,WeightRecordForm,BloodPressureRecordForm,HeartRateRecordForm
 from app.models import User,Daytimecheckdata
 from app.drawimg import drawlinegraph
 
@@ -443,6 +443,54 @@ def registerpost():
     return render_template('register.html', form=form,nkname="haha")
 
 
+
+@app.route("/blood_pressure_info_doctor", methods=['GET'])
+def blood_pressure_info_doctor():
+    # pdb.set_trace()
+    openid = request.args.get('open_id')
+    logging.info("weight_info_doctor:open_id"+openid)
+    user = User.query.filter_by(open_id=openid).first_or_404()
+    daytimedatas=Daytimecheckdata.query.filter_by(identity_id=user.identity_id)
+    # dates=[dayinfo.rhythm_of_heart for dayinfo in daytimedatas]
+
+    dates=[]
+    diastolic_pressures=[]
+    systolic_pressures=[]
+    for dayinfo in daytimedatas:
+        dates.append(dayinfo.datetime)
+        diastolic_pressures.append(dayinfo.diastolic_pressure)
+        systolic_pressures.append(dayinfo.systolic_pressure)
+
+    output = drawlinegraph(dates,diastolic_pressures,systolic_pressures,"date","rhythm_of_heart")
+    imgdata = "data:image/png;base64,"+base64.b64encode(output.getvalue()).decode("utf-8")
+
+    return render_template('weight_info_doctor.html',user=user,daytimedatas=daytimedatas,imgdata=imgdata)
+
+
+
+@app.route("/weight_info_doctor", methods=['GET'])
+def weight_info_doctor():
+    # pdb.set_trace()
+    openid = request.args.get('open_id')
+    logging.info("weight_info_doctor:open_id"+openid)
+    user = User.query.filter_by(open_id=openid).first_or_404()
+    daytimedatas=Daytimecheckdata.query.filter_by(identity_id=user.identity_id)
+    # dates=[dayinfo.rhythm_of_heart for dayinfo in daytimedatas]
+
+    dates=[]
+    weights=[]
+    for dayinfo in daytimedatas:
+        dates.append(dayinfo.datetime)
+        weights.append(dayinfo.weight)
+
+    output = drawlinegraph(dates,weights,"date","rhythm_of_heart")
+    imgdata = "data:image/png;base64,"+base64.b64encode(output.getvalue()).decode("utf-8")
+
+    return render_template('weight_info_doctor.html',user=user,daytimedatas=daytimedatas,imgdata=imgdata)
+
+
+
+
 @app.route("/weight_info_record", methods=['GET', 'POST'])
 def weight_info_record():
     openid = request.args.get('open_id')
@@ -749,6 +797,6 @@ if __name__ == '__main__':
     ts = time.time()
     logging.basicConfig(filename='log/medicallog'+str(ts)+'.log',level=logging.INFO)
     try:
-        app.run(host="0.0.0.0",port=80, debug=True)
+        app.run(host="0.0.0.0",port=8000, debug=True)
     except Exception as e:
         logging.exception(e)

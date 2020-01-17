@@ -22,6 +22,7 @@ from matplotlib.figure import Figure
 # # axis = fig.add_subplot(1, 1, 1)
 # dates = [pd.to_datetime(d) for d in ["2019-01-01","2019-02-01","2019-03-01","2019-04-01","2019-10-01"]]
 # plt.plot(dates, [67,68,69,70,79])
+# plt.plot(dates, [167,168,69,70,179])
 # # plt.savefig(fig, format='png')
 # plt.xlabel("xaxis")
 # plt.ylabel("yaxis")
@@ -29,14 +30,31 @@ from matplotlib.figure import Figure
 #
 # plt.show()
 
+def drawlinegraph(dates,values,values2,xaxis,yaxis):
+    # try:
+    # dates = [pd.to_datetime(d) for d in ["2019-01-01", "2019-02-01", "2019-03-01", "2019-04-01", "2019-10-01"]]
+    plt.plot(dates, values)
+    plt.plot(dates, values2)
+    # plt.savefig(fig, format='png')
+    plt.xlabel(xaxis)
+    plt.ylabel(yaxis)
+    plt.xticks(rotation=15)
+    output = io.BytesIO()
+
+    plt.savefig(output, format='png')
+
+
+    return output
+    # except Exception as ex:
+    #     logging.info(" failed "+str(ex))
 
 def drawlinegraph(dates,values,xaxis,yaxis):
     # try:
     # dates = [pd.to_datetime(d) for d in ["2019-01-01", "2019-02-01", "2019-03-01", "2019-04-01", "2019-10-01"]]
     plt.plot(dates, values)
     # plt.savefig(fig, format='png')
-    plt.xlabel("xaxis")
-    plt.ylabel("yaxis")
+    plt.xlabel(xaxis)
+    plt.ylabel(yaxis)
     plt.xticks(rotation=15)
     output = io.BytesIO()
 
