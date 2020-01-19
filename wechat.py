@@ -478,12 +478,14 @@ def weight_info_doctor():
     # dates=[dayinfo.rhythm_of_heart for dayinfo in daytimedatas]
 
     dates=[]
-    weights=[]
+    diastolic_pressures=[]
+    systolic_pressures=[]
     for dayinfo in daytimedatas:
         dates.append(dayinfo.datetime)
-        weights.append(dayinfo.weight)
+        diastolic_pressures.append(dayinfo.diastolic_pressure)
+        systolic_pressures.append(dayinfo.systolic_pressure)
 
-    output = drawlinegraph(dates,weights,"date","rhythm_of_heart")
+    output = drawlinegraph(dates,diastolic_pressures,systolic_pressures,"date","rhythm_of_heart")
     imgdata = "data:image/png;base64,"+base64.b64encode(output.getvalue()).decode("utf-8")
 
     return render_template('weight_info_doctor.html',user=user,daytimedatas=daytimedatas,imgdata=imgdata)
