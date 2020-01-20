@@ -444,27 +444,7 @@ def registerpost():
 
 
 
-@app.route("/blood_pressure_info_doctor", methods=['GET'])
-def blood_pressure_info_doctor():
-    # pdb.set_trace()
-    openid = request.args.get('open_id')
-    logging.info("weight_info_doctor:open_id"+openid)
-    user = User.query.filter_by(open_id=openid).first_or_404()
-    daytimedatas=Daytimecheckdata.query.filter_by(identity_id=user.identity_id)
-    # dates=[dayinfo.rhythm_of_heart for dayinfo in daytimedatas]
 
-    dates=[]
-    diastolic_pressures=[]
-    systolic_pressures=[]
-    for dayinfo in daytimedatas:
-        dates.append(dayinfo.datetime)
-        diastolic_pressures.append(dayinfo.diastolic_pressure)
-        systolic_pressures.append(dayinfo.systolic_pressure)
-
-    output = drawlinegraph(dates,diastolic_pressures,systolic_pressures,"date","rhythm_of_heart")
-    imgdata = "data:image/png;base64,"+base64.b64encode(output.getvalue()).decode("utf-8")
-
-    return render_template('weight_info_doctor.html',user=user,daytimedatas=daytimedatas,imgdata=imgdata)
 
 
 
@@ -533,6 +513,44 @@ def weight_info():
 
 
 
+
+
+
+@app.route("/blood_pressure_info", methods=['GET', 'POST'])
+def blood_pressure_info():
+    openid = request.args.get('open_id')
+    print("in dailycheck openid="+openid)
+    form = BloodPressureRecordForm()
+
+    return render_template('blood_pressure_info.html', form=form,open_id=openid)
+
+
+
+@app.route("/blood_pressure_info_doctor", methods=['GET'])
+def blood_pressure_info_doctor():
+    # pdb.set_trace()
+    openid = request.args.get('open_id')
+    logging.info("weight_info_doctor:open_id"+openid)
+    user = User.query.filter_by(open_id=openid).first_or_404()
+    daytimedatas=Daytimecheckdata.query.filter_by(identity_id=user.identity_id)
+    # dates=[dayinfo.rhythm_of_heart for dayinfo in daytimedatas]
+
+    dates=[]
+    diastolic_pressures=[]
+    systolic_pressures=[]
+    for dayinfo in daytimedatas:
+        dates.append(dayinfo.datetime)
+        diastolic_pressures.append(dayinfo.diastolic_pressure)
+        systolic_pressures.append(dayinfo.systolic_pressure)
+
+    output = drawlinegraph(dates,diastolic_pressures,systolic_pressures,"date","blood_pressure")
+    imgdata = "data:image/png;base64,"+base64.b64encode(output.getvalue()).decode("utf-8")
+
+    return render_template('weight_info_doctor.html',user=user,daytimedatas=daytimedatas,imgdata=imgdata)
+
+
+
+
 @app.route("/blood_pressure_record", methods=['GET', 'POST'])
 def blood_pressure_record():
     openid = request.args.get('open_id')
@@ -563,17 +581,6 @@ def blood_pressure_record():
         return str(ex)
 
 
-
-@app.route("/blood_pressure_info", methods=['GET', 'POST'])
-def blood_pressure_info():
-    openid = request.args.get('open_id')
-    print("in dailycheck openid="+openid)
-    form = BloodPressureRecordForm()
-
-    return render_template('blood_pressure_info.html', form=form,open_id=openid)
-
-
-
 @app.route("/heart_rate_record", methods=['GET', 'POST'])
 def heart_rate_record():
     openid = request.args.get('open_id')
@@ -601,6 +608,30 @@ def heart_rate_record():
         if "Duplicate entry" in exstr:
             return "不许重复录入"
         return str(ex)
+
+
+
+@app.route("/blood_pressure_info_doctor", methods=['GET'])
+def blood_pressure_info_doctor():
+    # pdb.set_trace()
+    openid = request.args.get('open_id')
+    logging.info("blood_pressure_info_doctor:open_id"+openid)
+    user = User.query.filter_by(open_id=openid).first_or_404()
+    daytimedatas=Daytimecheckdata.query.filter_by(identity_id=user.identity_id)
+    # dates=[dayinfo.rhythm_of_heart for dayinfo in daytimedatas]
+
+    dates=[]
+    rhythm_of_hearts=[]
+
+    for dayinfo in daytimedatas:
+        dates.append(dayinfo.datetime)
+        rhythm_of_hearts.append(dayinfo.rhythm_of_heart)
+
+
+    output = drawlinegraph(dates,diastolic_pressures,systolic_pressures,"date","rhythm_of_heart")
+    imgdata = "data:image/png;base64,"+base64.b64encode(output.getvalue()).decode("utf-8")
+
+    return render_template('weight_info_doctor.html',user=user,daytimedatas=daytimedatas,imgdata=imgdata)
 
 
 
