@@ -30,11 +30,12 @@ from matplotlib.figure import Figure
 #
 # plt.show()
 
-def drawlinegraph(dates,values,values2,xaxis,yaxis):
+def drawlinegraph2(dates,values,values2,xaxis,yaxis):
     # try:
     # dates = [pd.to_datetime(d) for d in ["2019-01-01", "2019-02-01", "2019-03-01", "2019-04-01", "2019-10-01"]]
-    plt.plot(dates, values)
-    plt.plot(dates, values2)
+    plt.figure(figsize=(16,8))
+    plt.plot(dates, values,'--bo')
+    plt.plot(dates, values2,'--bo')
     # plt.savefig(fig, format='png')
     plt.xlabel(xaxis)
     plt.ylabel(yaxis)
@@ -51,7 +52,8 @@ def drawlinegraph(dates,values,values2,xaxis,yaxis):
 def drawlinegraph(dates,values,xaxis,yaxis):
     # try:
     # dates = [pd.to_datetime(d) for d in ["2019-01-01", "2019-02-01", "2019-03-01", "2019-04-01", "2019-10-01"]]
-    plt.plot(dates, values)
+    plt.figure(figsize=(16, 8))
+    plt.plot(dates, values,'--bo')
     # plt.savefig(fig, format='png')
     plt.xlabel(xaxis)
     plt.ylabel(yaxis)
@@ -66,7 +68,7 @@ def drawlinegraph(dates,values,xaxis,yaxis):
     #     logging.info(" failed "+str(ex))
 
 
-def drawlinegraph2(dates,value,xaxis,yaxis):
+def drawlinegraph12(dates,value,xaxis,yaxis):
     # try:
     fig = Figure()
     axis = fig.add_subplot(1, 1, 1)
@@ -84,7 +86,7 @@ def drawlinegraph2(dates,value,xaxis,yaxis):
     # except Exception as ex:
     #     logging.info(" failed "+str(ex))
 
-def drawlinegraph2(dates,value,xaxis,yaxis):
+def drawlinegraph22(dates,value,xaxis,yaxis):
     try:
         fig = Figure()
         axis = fig.add_subplot(1, 1, 1)

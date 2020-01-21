@@ -20,7 +20,7 @@ from urllib.parse import quote
 from app.context import app,WECHAT_TOKEN,WECHAT_APPID,WECHAT_APPSECRET,db
 from app.forms import RegisterForm,DailyCheckForm,WeightRecordForm,BloodPressureRecordForm,HeartRateRecordForm
 from app.models import User,Daytimecheckdata
-from app.drawimg import drawlinegraph
+from app.drawimg import drawlinegraph,drawlinegraph2
 
 import qrcode
 import threading
@@ -244,6 +244,19 @@ def mainpage():
     open_id = request.args.get("open_id")
     return render_template('index.html',open_id=open_id)
 
+
+
+
+@app.route("/index_for_doctor")
+def index_for_doctor():
+    open_id = request.args.get("open_id")
+    return render_template('index_for_doctor.html',open_id=open_id)
+
+
+
+
+
+
 @app.route("/sendtouserpage", methods=['GET', 'POST'])
 def sendtouserpage():
     open_id=request.form.get("openid")
@@ -458,14 +471,16 @@ def weight_info_doctor():
     # dates=[dayinfo.rhythm_of_heart for dayinfo in daytimedatas]
 
     dates=[]
-    diastolic_pressures=[]
-    systolic_pressures=[]
-    for dayinfo in daytimedatas:
-        dates.append(dayinfo.datetime)
-        diastolic_pressures.append(dayinfo.diastolic_pressure)
-        systolic_pressures.append(dayinfo.systolic_pressure)
 
-    output = drawlinegraph(dates,diastolic_pressures,systolic_pressures,"date","rhythm_of_heart")
+    weights=[]
+    for dayinfo in daytimedatas:
+        if dayinfo.weight==None:
+            continue
+        dates.append(dayinfo.datetime)
+        weights.append(dayinfo.weight)
+
+
+    output = drawlinegraph(dates,weights,"date","weight")
     imgdata = "data:image/png;base64,"+base64.b64encode(output.getvalue()).decode("utf-8")
 
     return render_template('weight_info_doctor.html',user=user,daytimedatas=daytimedatas,imgdata=imgdata)
@@ -530,7 +545,7 @@ def blood_pressure_info():
 def blood_pressure_info_doctor():
     # pdb.set_trace()
     openid = request.args.get('open_id')
-    logging.info("weight_info_doctor:open_id"+openid)
+    logging.info("blood_pressure_info_doctor:open_id"+openid)
     user = User.query.filter_by(open_id=openid).first_or_404()
     daytimedatas=Daytimecheckdata.query.filter_by(identity_id=user.identity_id)
     # dates=[dayinfo.rhythm_of_heart for dayinfo in daytimedatas]
@@ -539,14 +554,16 @@ def blood_pressure_info_doctor():
     diastolic_pressures=[]
     systolic_pressures=[]
     for dayinfo in daytimedatas:
+        if dayinfo.diastolic_pressure==None or dayinfo.systolic_pressure==None:
+            continue
         dates.append(dayinfo.datetime)
         diastolic_pressures.append(dayinfo.diastolic_pressure)
         systolic_pressures.append(dayinfo.systolic_pressure)
 
-    output = drawlinegraph(dates,diastolic_pressures,systolic_pressures,"date","blood_pressure")
+    output = drawlinegraph2(dates,diastolic_pressures,systolic_pressures,"date","blood_pressure")
     imgdata = "data:image/png;base64,"+base64.b64encode(output.getvalue()).decode("utf-8")
 
-    return render_template('weight_info_doctor.html',user=user,daytimedatas=daytimedatas,imgdata=imgdata)
+    return render_template('blood_pressure_info_doctor.html',user=user,daytimedatas=daytimedatas,imgdata=imgdata)
 
 
 
@@ -611,11 +628,11 @@ def heart_rate_record():
 
 
 
-@app.route("/blood_pressure_info_doctor", methods=['GET'])
-def blood_pressure_info_doctor():
+@app.route("/heart_rate_info_doctor", methods=['GET'])
+def heart_rate_info_doctor():
     # pdb.set_trace()
     openid = request.args.get('open_id')
-    logging.info("blood_pressure_info_doctor:open_id"+openid)
+    logging.info("heart_rate_info_doctor:open_id"+openid)
     user = User.query.filter_by(open_id=openid).first_or_404()
     daytimedatas=Daytimecheckdata.query.filter_by(identity_id=user.identity_id)
     # dates=[dayinfo.rhythm_of_heart for dayinfo in daytimedatas]
@@ -624,14 +641,16 @@ def blood_pressure_info_doctor():
     rhythm_of_hearts=[]
 
     for dayinfo in daytimedatas:
+        if dayinfo.rhythm_of_heart==None:
+            continue
         dates.append(dayinfo.datetime)
         rhythm_of_hearts.append(dayinfo.rhythm_of_heart)
 
 
-    output = drawlinegraph(dates,diastolic_pressures,systolic_pressures,"date","rhythm_of_heart")
+    output = drawlinegraph(dates,rhythm_of_hearts,"date","rhythm_of_heart")
     imgdata = "data:image/png;base64,"+base64.b64encode(output.getvalue()).decode("utf-8")
 
-    return render_template('weight_info_doctor.html',user=user,daytimedatas=daytimedatas,imgdata=imgdata)
+    return render_template('heart_rate_info_doctor.html',user=user,daytimedatas=daytimedatas,imgdata=imgdata)
 
 
 
