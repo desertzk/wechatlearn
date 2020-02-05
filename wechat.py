@@ -402,7 +402,7 @@ def create_figure():
 
 
 def createqrcode(open_id):
-    url=app.config["HOST"]+"index_for_doctor?openid="+open_id
+    url=app.config["HOST"]+"index_for_doctor?open_id="+open_id
 
     logging.info("createqrcodeurl:" + url)
     img = qrcode.make(url)
