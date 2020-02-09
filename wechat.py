@@ -209,6 +209,7 @@ def wechat():
                     createqrcode(openid)
                     rspjson=g_wxreq.send_tmp_media("resources/"+openid+".jpg")
                     rspdict=json.loads(rspjson)
+                    logging.info("tmp media ok:"+rspjson)
                     resp_dict = {
                         "xml": {
                             "ToUserName": xml_dict.get("FromUserName"),
@@ -490,8 +491,9 @@ def weight_info_doctor():
 
 @app.route("/weight_info_record", methods=['GET', 'POST'])
 def weight_info_record():
+
     openid = request.args.get('open_id')
-    print("in dailycheck openid="+openid)
+    logging.info("in dailycheck openid="+openid)
     userinfo = User.query.filter_by(open_id=openid).first_or_404()
     form=request.form
     try:
@@ -501,7 +503,8 @@ def weight_info_record():
         if daycheck!=None:
             daycheck.weight = form.get("weight")
         else:
-            dailycheckdata = Daytimecheckdata(weight=form.get("weight"),identity_id=userinfo.identity_id)
+            dailycheckdata = Daytimecheckdata(weight=form.get("weight"),identity_id=userinfo.identity_id,
+                                             datetime=datetime.today().strftime("%Y-%m-%d"))
             db.session.add(dailycheckdata)
 
 
@@ -511,7 +514,7 @@ def weight_info_record():
     except Exception as ex:
         exstr = str(ex)
 
-        print(exstr)
+        logging.info(exstr)
         if "Duplicate entry" in exstr:
             return "不许重复录入"
         return str(ex)
@@ -534,7 +537,7 @@ def weight_info():
 @app.route("/blood_pressure_info", methods=['GET', 'POST'])
 def blood_pressure_info():
     openid = request.args.get('open_id')
-    print("in dailycheck openid="+openid)
+    logging.info("in dailycheck blood_pressure_info openid="+openid)
     form = BloodPressureRecordForm()
 
     return render_template('blood_pressure_info.html', form=form,open_id=openid)
@@ -571,7 +574,7 @@ def blood_pressure_info_doctor():
 @app.route("/blood_pressure_record", methods=['GET', 'POST'])
 def blood_pressure_record():
     openid = request.args.get('open_id')
-    print("in dailycheck openid="+openid)
+    logging.info("in blood_pressure_record openid="+openid)
     userinfo = User.query.filter_by(open_id=openid).first_or_404()
     form=request.form
     try:
@@ -582,7 +585,8 @@ def blood_pressure_record():
             daycheck.systolic_pressure = form.get("systolic_pressure")
             daycheck.diastolic_pressure = form.get("diastolic_pressure")
         else:
-            dailycheckdata = Daytimecheckdata(systolic_pressure=form.get("systolic_pressure"),diastolic_pressure=form.get("diastolic_pressure"),identity_id=userinfo.identity_id)
+            dailycheckdata = Daytimecheckdata(systolic_pressure=form.get("systolic_pressure"),diastolic_pressure=form.get("diastolic_pressure"),identity_id=userinfo.identity_id,
+                                             datetime=datetime.today().strftime("%Y-%m-%d"))
             db.session.add(dailycheckdata)
 
 
@@ -592,7 +596,7 @@ def blood_pressure_record():
     except Exception as ex:
         exstr = str(ex)
 
-        print(exstr)
+        logging.info(exstr)
         if "Duplicate entry" in exstr:
             return "不许重复录入"
         return str(ex)
@@ -601,7 +605,7 @@ def blood_pressure_record():
 @app.route("/heart_rate_record", methods=['GET', 'POST'])
 def heart_rate_record():
     openid = request.args.get('open_id')
-    print("in dailycheck openid="+openid)
+    logging.info("inheart_rate_record openid="+openid)
     userinfo = User.query.filter_by(open_id=openid).first_or_404()
     form=request.form
     try:
@@ -611,7 +615,8 @@ def heart_rate_record():
         if daycheck!=None:
             daycheck.rhythm_of_heart = form.get("rhythm_of_heart")
         else:
-            dailycheckdata = Daytimecheckdata(rhythm_of_heart=form.get("rhythm_of_heart"),identity_id=userinfo.identity_id)
+            dailycheckdata = Daytimecheckdata(rhythm_of_heart=form.get("rhythm_of_heart"),identity_id=userinfo.identity_id,
+                                             datetime=datetime.today().strftime("%Y-%m-%d"))
             db.session.add(dailycheckdata)
 
 
@@ -846,8 +851,9 @@ if __name__ == '__main__':
     #testinterface()
     #g_wxreq.send_tmp_media(r"H:\ccppworkspace\imageprocess\Project1\lena_top.jpg")
     infostr='{"openid":"oCE0-wNsOEzivCjtXhIvA3iL2ieg","nickname":"望尘莫及","sex":1,"language":"en","city":"杭州","province":"浙江","country":"中国","headimgurl":"http:\/\/thirdwx.qlogo.cn\/mmopen\/vi_32\/Q0j4TwGTfTKXzUU0bIPQWC6Xia07jenOIeoyEdNNyqEHMia1ZArFP01mXWB5DD2qzyIM3mwGy7IsiaK896icICRYuw\/132","privilege":[]}'
+    FORMAT = '%(asctime)-15s %(message)s'
     ts = time.time()
-    logging.basicConfig(filename='log/medicallog'+str(ts)+'.log',level=logging.INFO)
+    logging.basicConfig(format=FORMAT,filename='log/medicallog'+str(ts)+'.log',level=logging.INFO)
     try:
         app.run(host="0.0.0.0",port=80, debug=True)
     except Exception as e:
