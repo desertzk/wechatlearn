@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,11 +8,13 @@
 <body>
     <form action="/blood_pressure_record?open_id={{open_id}}" method="post" novalidate>
      <p>
-            {{ form.diastolic_pressure.label }}
+         <font face="verdana" size="6" color="black">舒张压</font>
+            {{ #form.diastolic_pressure.label }}
             {{ form.diastolic_pressure(size=10) }}<br>
         </p>
         <p>
-            {{ form.systolic_pressure.label }}
+            <font face="verdana" size="6" color="black">收缩压</font>
+            {{ #form.systolic_pressure.label }}
             {{ form.systolic_pressure(size=10) }}<br>
         </p>
         <p>{{ form.submit() }}</p>

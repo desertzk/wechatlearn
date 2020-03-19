@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,7 +8,7 @@
 <body>
     <form action="/weight_info_record?open_id={{open_id}}" method="post" novalidate>
      <p>
-            {{ form.weight.label }}
+            <font face="verdana" size="6" color="black">心率</font>
             {{ form.weight(size=10) }}<br>
         </p>
         <p>{{ form.submit() }}</p>

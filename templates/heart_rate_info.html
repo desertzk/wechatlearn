@@ -1,16 +1,20 @@
 <!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
 <body>
+<p style="text-align:center;">
     <form action="/heart_rate_record?open_id={{open_id}}" method="post" novalidate>
      <p>
-            {{ form.rhythm_of_heart.label }}
+         <font face="verdana" size="6" color="black">心率</font>
+            {{ #form.rhythm_of_heart.label }}
             {{ form.rhythm_of_heart(size=10) }}<br>
         </p>
         <p>{{ form.submit() }}</p>
     </form>
+</p>
 </body>
 </html>
