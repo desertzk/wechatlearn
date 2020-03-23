@@ -6,15 +6,16 @@
     <title>Title</title>
 </head>
 <body>
-<p style="text-align:center;">
+
+    <div style="text-align:center">
+
     <form action="/heart_rate_record?open_id={{open_id}}" method="post" novalidate>
      <p>
-         <font face="verdana" size="6" color="black">心率</font>
-            {{ #form.rhythm_of_heart.label }}
+         <font face="verdana" size="4" color="black">心率</font>
             {{ form.rhythm_of_heart(size=10) }}<br>
         </p>
         <p>{{ form.submit() }}</p>
     </form>
-</p>
+</div>
 </body>
 </html>

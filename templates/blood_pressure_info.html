@@ -6,18 +6,18 @@
     <title>Title</title>
 </head>
 <body>
+    <div style="text-align:center">
     <form action="/blood_pressure_record?open_id={{open_id}}" method="post" novalidate>
      <p>
-         <font face="verdana" size="6" color="black">舒张压</font>
-            {{ #form.diastolic_pressure.label }}
+         <font face="verdana" size="4" color="black">舒张压:</font>
             {{ form.diastolic_pressure(size=10) }}<br>
         </p>
         <p>
-            <font face="verdana" size="6" color="black">收缩压</font>
-            {{ #form.systolic_pressure.label }}
+            <font face="verdana" size="4" color="black">收缩压:</font>
             {{ form.systolic_pressure(size=10) }}<br>
         </p>
         <p>{{ form.submit() }}</p>
     </form>
+    </div>
 </body>
 </html>

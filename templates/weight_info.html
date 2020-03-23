@@ -6,12 +6,14 @@
     <title>Title</title>
 </head>
 <body>
+    <div style="text-align:center">
     <form action="/weight_info_record?open_id={{open_id}}" method="post" novalidate>
      <p>
-            <font face="verdana" size="6" color="black">心率</font>
+            <font face="verdana" size="4" color="black">体重</font>
             {{ form.weight(size=10) }}<br>
         </p>
         <p>{{ form.submit() }}</p>
     </form>
+    </div>
 </body>
 </html>
