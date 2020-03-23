@@ -19,6 +19,7 @@ class User(db.Model):
     height = db.Column(db.DECIMAL(5,2))
     weight = db.Column(db.DECIMAL(5,2))
     gender=db.Column(db.Integer)
+    # 0 admin 1 docter 2 patient
     role=db.Column(db.Integer)
     identity_id=db.Column(db.String(32), unique=True)
     open_id= db.Column(db.String(32))

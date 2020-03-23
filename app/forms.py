@@ -1,12 +1,13 @@
 # coding:utf-8
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField,IntegerField,DecimalField, SubmitField,HiddenField
+from wtforms import StringField, PasswordField, BooleanField,IntegerField,DecimalField, SubmitField,HiddenField,SelectField
 from wtforms.validators import DataRequired
 
 class RegisterForm(FlaskForm):
     name = StringField('姓名', validators=[DataRequired()])
     identification = StringField('身份证', validators=[DataRequired()])
     email = StringField('email')
+    docter = SelectField(label='医生')
     wxopenid=HiddenField()
     json_user_info=""
     sex=HiddenField()

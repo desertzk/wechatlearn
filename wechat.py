@@ -415,6 +415,8 @@ def createqrcode(open_id):
 def register():
     # pdb.set_trace()
     form = RegisterForm()
+    docters =db.session.query(User).filter((User.role==1)|(User.role==3)).all()
+    form.docter.choices = [ (item.role,item.name) for item in docters]
     logging.info(request.args)
     openid=request.args.get("wxopenid")
     identification=request.args.get("identification")
@@ -427,7 +429,7 @@ def register():
            if userinfo!=None:
                return "已经注册"
 
-           user=User(name=name,identity_id=identification,open_id=openid,email=email)
+           user=User(name=name,identity_id=identification,open_id=openid,email=email,role=2)
            db.session.add(user)
            db.session.commit()
            return redirect('/after_register')
@@ -436,7 +438,7 @@ def register():
             return str(e)
 
 
-    return render_template('register.html', form=form,nkname="haha")
+    return render_template('register.html', form=form,nkname="")
     return "注册失败"
 
 
@@ -449,12 +451,12 @@ def registerpost():
         flash('Login requested for user {}, remember_me={}'.format(
             form.name.data, form.wxopenid.data))
         logging.info(form.name.data+form.wxopenid.data)
-        user=User(name=form.name.data,identity_id=form.identification.data,open_id=form.wxopenid.data,email=form.email.data)
+        user=User(name=form.name.data,identity_id=form.identification.data,open_id=form.wxopenid.data,email=form.email.data,role=1)
         db.session.add(user)
         db.session.commit()
         return redirect('/after_register')
 
-    return render_template('register.html', form=form,nkname="haha")
+    return render_template('register_docter.html', form=form,nkname="医生注册")
 
 
 
@@ -853,8 +855,9 @@ if __name__ == '__main__':
     infostr='{"openid":"oCE0-wNsOEzivCjtXhIvA3iL2ieg","nickname":"望尘莫及","sex":1,"language":"en","city":"杭州","province":"浙江","country":"中国","headimgurl":"http:\/\/thirdwx.qlogo.cn\/mmopen\/vi_32\/Q0j4TwGTfTKXzUU0bIPQWC6Xia07jenOIeoyEdNNyqEHMia1ZArFP01mXWB5DD2qzyIM3mwGy7IsiaK896icICRYuw\/132","privilege":[]}'
     FORMAT = '%(asctime)-15s %(message)s'
     ts = time.time()
-    logging.basicConfig(format=FORMAT,filename='log/medicallog'+str(ts)+'.log',level=logging.INFO)
     try:
+        logging.basicConfig(format=FORMAT,filename='log/medicallog'+str(ts)+'.log',level=logging.INFO)
+
         app.run(host="0.0.0.0",port=80, debug=True)
     except Exception as e:
         logging.exception(e)
