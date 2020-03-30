@@ -26,7 +26,7 @@ class User(db.Model):
     city = db.Column(db.String(16))
     province = db.Column(db.String(16))
     status = db.Column(db.Integer)
-
+    doctor_id=db.Column(db.Integer)
 
     def __repr__(self):
         return '<User {}>'.format(self.username)

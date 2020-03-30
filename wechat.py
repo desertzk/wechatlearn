@@ -251,6 +251,7 @@ def mainpage():
 @app.route("/index_for_doctor")
 def index_for_doctor():
     open_id = request.args.get("open_id")
+
     return render_template('index_for_doctor.html',open_id=open_id)
 
 
@@ -416,12 +417,12 @@ def register():
     # pdb.set_trace()
     form = RegisterForm()
     docters =db.session.query(User).filter((User.role==1)|(User.role==3)).all()
-    form.docter.choices = [ (item.role,item.name) for item in docters]
+    form.doctor.choices = [ (item.id,item.name) for item in docters]
     logging.info(request.args)
     openid=request.args.get("wxopenid")
     identification=request.args.get("identification")
     email=request.args.get("email")
-
+    doctor_id=int(request.args.get("doctor"))
     name=request.args.get("name")
     if openid !=None:
         try:
@@ -429,7 +430,7 @@ def register():
            if userinfo!=None:
                return "已经注册"
 
-           user=User(name=name,identity_id=identification,open_id=openid,email=email,role=2)
+           user=User(name=name,identity_id=identification,open_id=openid,email=email,role=2,doctor_id=doctor_id)
            db.session.add(user)
            db.session.commit()
            return redirect('/after_register')
@@ -805,6 +806,8 @@ def index():
             # 将用户的资料数据填充到页面中
             #return render_template("index.html", user=user_dict_data)
             form = RegisterForm()
+            doctors =db.session.query(User).filter((User.role==1)|(User.role==3)).all()
+            form.doctor.choices = [ (item.id,item.name) for item in doctors]
             form.wxopenid.data=open_id
             form.json_user_info=user_json_str
             form.sex.data=user_dict_data["sex"]
