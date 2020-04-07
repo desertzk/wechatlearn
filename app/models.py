@@ -14,6 +14,7 @@ class User(db.Model):
     __tablename__ = 'tusers'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(32))
+    password = db.Column(db.String(32))
     email = db.Column(db.String(128), index=True, unique=True)
     birthday = db.Column(db.String(16))
     height = db.Column(db.DECIMAL(5,2))

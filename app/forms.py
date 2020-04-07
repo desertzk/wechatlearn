@@ -4,16 +4,27 @@ from wtforms import StringField, PasswordField, BooleanField,IntegerField,Decima
 from wtforms.validators import DataRequired
 
 class RegisterForm(FlaskForm):
+    # def __init__(self):
+    #     self.doctor.choices=[]
+
     name = StringField('姓名', validators=[DataRequired()])
     identification = StringField('身份证', validators=[DataRequired()])
     email = StringField('email')
-    doctor = SelectField(label='医生')
+    doctor = SelectField(label='医生',choices=[(0, "无")],coerce=int)
+    password = PasswordField("密码")
     wxopenid=HiddenField()
     json_user_info=""
     sex=HiddenField()
     # password = PasswordField('Password', validators=[DataRequired()])
     # remember_me = BooleanField('Remember Me')
     submit = SubmitField('提交')
+
+
+class LoginForm(FlaskForm):
+    identification = StringField('身份证', validators=[DataRequired()])
+    password = PasswordField("密码")
+    submit = SubmitField('登录')
+
 
 
 class DailyCheckForm(FlaskForm):

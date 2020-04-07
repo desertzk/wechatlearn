@@ -18,7 +18,7 @@ import logging
 from datetime import datetime
 from urllib.parse import quote
 from app.context import app,WECHAT_TOKEN,WECHAT_APPID,WECHAT_APPSECRET,db
-from app.forms import RegisterForm,DailyCheckForm,WeightRecordForm,BloodPressureRecordForm,HeartRateRecordForm
+from app.forms import RegisterForm,DailyCheckForm,WeightRecordForm,BloodPressureRecordForm,HeartRateRecordForm,LoginForm
 from app.models import User,Daytimecheckdata
 from app.drawimg import drawlinegraph,drawlinegraph2
 
@@ -444,15 +444,33 @@ def register():
 
 
 
-@app.route("/registerpost", methods=['GET', 'POST'])
-def registerpost():
-    form = RegisterForm()
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
 
     if form.validate_on_submit():
-        flash('Login requested for user {}, remember_me={}'.format(
-            form.name.data, form.wxopenid.data))
+        logging.info("login"+form.identification.data)
+        identity_id = form.identification.data
+        password = form.password.data
+        user = User.query.filter_by(identity_id=identity_id,password=password).first_or_404()
+        if user==None:
+            return render_template('login.html', form=form, nkname="身份证号或密码错误")
+        else:
+            return redirect('/usersmanagerment?open_id='+user.open_id)
+
+    return render_template('login.html', form=form,nkname="医生登录")
+
+
+
+@app.route("/registerpost", methods=['GET', 'POST'])
+def registerpost():
+    form = RegisterForm(doctor=0)
+
+    if form.validate_on_submit():
+
         logging.info(form.name.data+form.wxopenid.data)
-        user=User(name=form.name.data,identity_id=form.identification.data,open_id=form.wxopenid.data,email=form.email.data,role=1)
+        user=User(name=form.name.data,identity_id=form.identification.data,open_id=form.wxopenid.data,email=form.email.data,role=1,password=form.password.data)
         db.session.add(user)
         db.session.commit()
         return redirect('/after_register')
