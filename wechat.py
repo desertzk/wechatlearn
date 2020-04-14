@@ -273,9 +273,14 @@ def show_user(identity_id):
     # return render_template('show_user.html', user=user)
     return render_template('sendtouserpage.html', user=user)
 
-@app.route("/usersmanagerment")
+@app.route("/usersmanagerment",methods=['GET'])
 def query_all_users():
-    userlist=User.query.order_by(User.name).all()
+    open_id = request.args.get("open_id")
+    login_user = User.query.filter_by(open_id=open_id).first()
+    if login_user.role == 0 or login_user.role == 3:
+        userlist=User.query.order_by(User.name).all()
+    elif login_user.role == 1:
+        userlist = User.query.filter_by(doctor_id=open_id)
     return render_template('usermanagerment.html', userlist=userlist)
 
 
@@ -453,7 +458,7 @@ def login():
         logging.info("login"+form.identification.data)
         identity_id = form.identification.data
         password = form.password.data
-        user = User.query.filter_by(identity_id=identity_id,password=password).first_or_404()
+        user = User.query.filter_by(identity_id=identity_id,password=password).first()
         if user==None:
             return render_template('login.html', form=form, nkname="身份证号或密码错误")
         else:
@@ -879,6 +884,6 @@ if __name__ == '__main__':
     try:
         logging.basicConfig(format=FORMAT,filename='log/medicallog'+str(ts)+'.log',level=logging.INFO)
 
-        app.run(host="0.0.0.0",port=80, debug=True)
+        app.run(host="0.0.0.0",port=8080, debug=True)
     except Exception as e:
         logging.exception(e)

@@ -2,7 +2,7 @@
 <html>
 <body>
 {% for user in userlist %}
-    <a href="/user/{{user.identity_id}}">{{user.name}}</a>
+    <a href="/index_for_doctor?open_id={{user.open_id}}">{{user.name}}</a>
 {% endfor %}
 
 
