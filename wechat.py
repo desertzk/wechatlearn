@@ -536,7 +536,7 @@ def weight_info_record():
 
         db.session.commit()
 
-        return "成功"
+        return render_template('index.html',open_id=openid)
     except Exception as ex:
         exstr = str(ex)
 
@@ -617,8 +617,7 @@ def blood_pressure_record():
 
 
         db.session.commit()
-
-        return "成功"
+        return render_template('index.html',open_id=openid)
     except Exception as ex:
         exstr = str(ex)
 
@@ -648,7 +647,7 @@ def heart_rate_record():
 
         db.session.commit()
 
-        return "成功"
+        return render_template('index.html',open_id=openid)
     except Exception as ex:
         exstr = str(ex)
 
@@ -724,7 +723,7 @@ def dailycheck():
             db.session.add(dailycheckdata)
             db.session.commit()
 
-            return "成功"
+            return render_template('index.html',open_id=openid)
         except Exception as ex:
             exstr=str(ex)
             if "Duplicate entry" in exstr:
@@ -884,6 +883,6 @@ if __name__ == '__main__':
     try:
         logging.basicConfig(format=FORMAT,filename='log/medicallog'+str(ts)+'.log',level=logging.INFO)
 
-        app.run(host="0.0.0.0",port=8080, debug=True)
+        app.run(host="0.0.0.0",port=80, debug=True)
     except Exception as e:
         logging.exception(e)
