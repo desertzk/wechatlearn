@@ -275,12 +275,12 @@ def show_user(identity_id):
 
 @app.route("/usersmanagerment",methods=['GET'])
 def query_all_users():
-    open_id = request.args.get("open_id")
-    login_user = User.query.filter_by(open_id=open_id).first()
+    identity_id = request.args.get("identity_id")
+    login_user = User.query.filter_by(identity_id=identity_id).first()
     if login_user.role == 0 or login_user.role == 3:
         userlist=User.query.order_by(User.name).all()
     elif login_user.role == 1:
-        userlist = User.query.filter_by(doctor_id=open_id)
+        userlist = User.query.filter_by(doctor_id=login_user.id)
     return render_template('usermanagerment.html', userlist=userlist)
 
 
@@ -462,7 +462,7 @@ def login():
         if user==None:
             return render_template('login.html', form=form, nkname="身份证号或密码错误")
         else:
-            return redirect('/usersmanagerment?open_id='+user.open_id)
+            return redirect('/usersmanagerment?identity_id='+user.identity_id)
 
     return render_template('login.html', form=form,nkname="医生登录")
 
@@ -473,10 +473,16 @@ def registerpost():
     form = RegisterForm(doctor=0)
 
     if form.validate_on_submit():
+        identity_id = form.identification.data
+        user = User.query.filter_by(identity_id=identity_id).first()
+        if user == None:
+            logging.info(form.name.data+form.wxopenid.data)
+            newuser=User(name=form.name.data,identity_id=form.identification.data,open_id=form.wxopenid.data,email=form.email.data,role=1,password=form.password.data)
+            db.session.add(newuser)
 
-        logging.info(form.name.data+form.wxopenid.data)
-        user=User(name=form.name.data,identity_id=form.identification.data,open_id=form.wxopenid.data,email=form.email.data,role=1,password=form.password.data)
-        db.session.add(user)
+        else:
+            user.password=form.password.data
+
         db.session.commit()
         return redirect('/after_register')
 
@@ -883,6 +889,6 @@ if __name__ == '__main__':
     try:
         logging.basicConfig(format=FORMAT,filename='log/medicallog'+str(ts)+'.log',level=logging.INFO)
 
-        app.run(host="0.0.0.0",port=80, debug=True)
+        app.run(host="0.0.0.0",port=8080, debug=True)
     except Exception as e:
         logging.exception(e)
