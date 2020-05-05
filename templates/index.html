@@ -1,16 +1,54 @@
 <!DOCTYPE html>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<html>
-<meta charset="UTF-8">
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .nav .nav-item a{
+            color: white;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 900;
+            padding: 30px;
+            font-size: 30px;
+        }
+        .nav .nav-item:nth-child(1){
+            background-color: #fc9c9d;
+        }
+        .nav .nav-item:nth-child(2){
+            background-color: #facdae;
+        }
+        .nav .nav-item:nth-child(3){
+            background-color: #c9c8aa;
+        }
+        .nav .nav-item:nth-child(4){
+            background-color: #84af9b;
+        }
+    </style>
+</head>
+
 <body>
-<p style="text-align:center;">
-<a style="font-size:25px;"  href="/weight_info?open_id={{open_id}}">体重</a>
-    <br>
-<a style="font-size:25px;" href="/blood_pressure_info?open_id={{open_id}}">血压</a>
-    <br>
-<a style="font-size:25px;" href="/heart_rate_info?open_id={{open_id}}">心率</a>
-    <br>
-<a  style="font-size:25px;" href="/medicine_info?open_id={{open_id}}">药物</a>
-</p>
+    <div class="nav">
+        <div class="nav-item">
+            <a href="/weight_info?open_id={{open_id}}">体重</a>
+        </div>
+        <div class="nav-item">
+            <a href="/blood_pressure_info?open_id={{open_id}}">血压</a>
+        </div>
+        <div class="nav-item">
+            <a href="/heart_rate_info?open_id={{open_id}}">心率</a>
+        </div>
+        <div class="nav-item">
+            <a href="/medicine_info?open_id={{open_id}}">药物</a>
+        </div>
+    </div>
 </body>
+
 </html>
