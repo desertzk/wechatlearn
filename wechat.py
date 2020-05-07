@@ -278,9 +278,13 @@ def query_all_users():
     identity_id = request.args.get("identity_id")
     login_user = User.query.filter_by(identity_id=identity_id).first()
     if login_user.role == 0 or login_user.role == 3:
-        userlist=User.query.order_by(User.name).all()
+        # userlist=User.query.order_by(User.name).all()
+        doctorlist = User.query.filter_by(role=1)
+        patientlist = User.query.filter_by(doctor_id=login_user.id)
+        userlist =[x for x in doctorlist] + [x for x in patientlist]
     elif login_user.role == 1:
         userlist = User.query.filter_by(doctor_id=login_user.id)
+    # elif login_user.role
     return render_template('usermanagerment.html', userlist=userlist)
 
 
