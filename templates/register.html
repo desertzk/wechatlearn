@@ -1,10 +1,33 @@
 <!DOCTYPE html>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<html>
-
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>register</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .register{
+            height: 100vh;
+            display: flex;
+            align-items: top;
+            margin-top: 30px;
+            text-align: center;
+        }
+        h1{
+            margin-bottom: 20px;
+        }
+        p{
+            width: 100%;
+            margin: 10px 0;
+        }
+    </style>
+</head>
 <body>
 
-<!--{% with messages = get_flashed_messages() %}-->
+    <!--{% with messages = get_flashed_messages() %}-->
 <!--        {% if messages %}-->
 <!--        <ul>-->
 <!--            {% for message in messages %}-->
@@ -15,28 +38,32 @@
 <!--        {% endwith %}-->
 
 
+<div class="register">
+    <div style="width: 100%;">
+        <h1>注册</h1>
+        <form action="/register" method="get" novalidate>
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.name.label }}<br>
+                {{ form.name(size=32) }}
+            </p>
+            <p>
+                {{ form.identification.label }}<br>
+                {{ form.identification(size=32) }}
+            </p>
+            <p>
+                {{ form.email.label }}<br>
+                {{ form.email(size=32) }}
+            </p>
+            <p>
+                {{ form.doctor.label }}<br>
+                {{ form.doctor }}
+            </p>
+            <p>{{ form.submit() }}</p>
+        </form>
+    </div>
 
-    <h1>注册</h1>
-    <form action="/register" method="get" novalidate>
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.name.label }}<br>
-            {{ form.name(size=32) }}
-        </p>
-        <p>
-            {{ form.identification.label }}<br>
-            {{ form.identification(size=32) }}
-        </p>
-        <p>
-            {{ form.email.label }}<br>
-            {{ form.email(size=32) }}
-        </p>
-        <p>
-            {{ form.doctor.label }}<br>
-            {{ form.doctor }}
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
-
-  </body>
+</div>
+    
+</body>
 </html>

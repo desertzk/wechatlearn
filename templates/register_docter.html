@@ -2,9 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Title</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .register{
+            height: 100vh;
+            display: flex;
+            align-items: top;
+            margin-top: 30px;
+            text-align: center;
+        }
+        h1{
+            margin-bottom: 20px;
+        }
+        p{
+            width: 100%;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
+<div class="register">
+    <div style="width: 100%;">
     <h1>{{nkname}}</h1>
     <form action="/registerpost" method="post" novalidate>
 
@@ -27,5 +50,7 @@
         {{ form.csrf_token}}
         <p>{{ form.submit() }}</p>
     </form>
+    </div>
+</div>
 </body>
 </html>
