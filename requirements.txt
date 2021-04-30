@@ -11,7 +11,7 @@ Jinja2==2.10.1
 MarkupSafe==1.1.1
 mysqlclient
 requests==2.22.0
-urllib3==1.25.3
+urllib3==1.25.8
 Werkzeug==0.15.6
 WTForms==2.2.1
 xmltodict==0.12.0
